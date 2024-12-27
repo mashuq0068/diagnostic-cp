@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  diagnostic-center-frontend:
+    build: .
+    ports:
+      - "5180:5180"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=production
+    command: ["serve", "-s", "dist", "-l", "5180"]
+    networks:
+      - frontend-net
+
+networks:
+  frontend-net:
+    driver: bridge

@@ -1,0 +1,2 @@
+docker build -t diagnostic_cp_frontend .
+docker run -d -p 5180:5180 --name diagnostic_cp_frontend diagnostic_cp_frontend
