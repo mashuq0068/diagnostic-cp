@@ -12,7 +12,7 @@ export const DesignationOptions = () => {
     const fetchDesignations = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`/designations`);
+        const res = await axios.get(`/designations?size=1000`);
         setDesignations(res?.data?.designations || []);
       } catch (error) {
         console.error("Failed to fetch designations:", error);
@@ -43,7 +43,7 @@ export const DepartmentOptions = () => {
     const fetchDepartments = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`/departments`);
+        const res = await axios.get(`/departments?size=1000`);
         setDepartments(res?.data?.departments || []);
       } catch (error) {
         console.error("Failed to fetch departments:", error);
@@ -66,14 +66,14 @@ export const DepartmentOptions = () => {
   );
 };
 // Dropdown component for districts
-export const DistrictOptions = ({ onDistrictChange  , defaultValue=""}) => {
+export const DistrictOptions = ({ onDistrictChange, defaultValue = "" }) => {
   const [districtOptions, setDistrictOptions] = useState([]);
   const { setLoading } = useLoadingStore();
   const defaultOption = districtOptions.find(
     (option) => option.value === defaultValue
   );
   console.log(defaultOption);
-console.log(defaultValue);
+  console.log(defaultValue);
   useEffect(() => {
     const fetchDistricts = async () => {
       setLoading(true);
@@ -96,6 +96,7 @@ console.log(defaultValue);
 
   return (
     <Select
+      required
       styles={customStyles}
       value={defaultOption || ""}
       options={districtOptions}
@@ -107,13 +108,16 @@ console.log(defaultValue);
 };
 
 // Dropdown component for upazilas
-export const UpazilaOptions = ({ onUpazilaChange, districtId , defaultValue="" }) => {
+export const UpazilaOptions = ({
+  onUpazilaChange,
+  districtId,
+  defaultValue = "",
+}) => {
   const [upazilaOptions, setUpazilaOptions] = useState([]);
   const { setLoading } = useLoadingStore();
   const defaultOption = upazilaOptions.find(
     (option) => option.value === defaultValue
   );
-
 
   useEffect(() => {
     if (!districtId) return; // Prevent API call if no districtId
@@ -141,6 +145,7 @@ export const UpazilaOptions = ({ onUpazilaChange, districtId , defaultValue="" }
   return (
     <div className="relative cursor-not-allowed">
       <Select
+        required
         options={upazilaOptions}
         value={defaultOption || ""}
         styles={customStyles}
@@ -149,7 +154,6 @@ export const UpazilaOptions = ({ onUpazilaChange, districtId , defaultValue="" }
         isSearchable
         isDisabled={!districtId} // Disable if districtId is not provided
       />
-     
     </div>
   );
 };
@@ -186,6 +190,7 @@ export const InstitutionOptions = ({
 
   return (
     <Select
+    required
       styles={customStyles}
       value={defaultOption || ""}
       options={institutionOptions}
@@ -196,10 +201,7 @@ export const InstitutionOptions = ({
     />
   );
 };
-export const EmployeeOptions = ({
-  onEmployeeChange,
-  defaultValue = "",
-}) => {
+export const EmployeeOptions = ({ onEmployeeChange, defaultValue = "" }) => {
   const [employeeOptions, setEmployeeOptions] = useState([]);
   const { setLoading } = useLoadingStore();
   const defaultOption = employeeOptions.find(
@@ -228,12 +230,95 @@ export const EmployeeOptions = ({
 
   return (
     <Select
+    required
       styles={customStyles}
       value={defaultOption || ""}
       options={employeeOptions}
       name="employee"
       placeholder="Select an Employee"
       onChange={onEmployeeChange}
+      isSearchable
+    />
+  );
+};
+
+export const DoctorOptions = ({ onDoctorChange, defaultValue = "" }) => {
+  const [doctorOptions, setDoctorOptions] = useState([]);
+  const { setLoading } = useLoadingStore();
+  const defaultOption = doctorOptions.find(
+    (option) => option.value === defaultValue
+  );
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`/doctors?size=1000`);
+        const options = res?.data?.doctors?.map((doctor) => ({
+          value: doctor.id,
+          label: doctor.nameEn,
+        }));
+        setDoctorOptions(options || []);
+      } catch (error) {
+        console.error("Failed to fetch doctors:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, [setLoading]);
+
+  return (
+    <Select
+    required
+      styles={customStyles}
+      value={defaultOption || ""}
+      options={doctorOptions}
+      name="doctor"
+      placeholder="Select a Doctor"
+      onChange={onDoctorChange}
+      isSearchable
+    />
+  );
+};
+
+export const AgentOptions = ({ onAgentChange, defaultValue = "" }) => {
+  const [agentOptions, setAgentOptions] = useState([]);
+  const { setLoading } = useLoadingStore();
+  const defaultOption = agentOptions.find(
+    (option) => option.value === defaultValue
+  );
+
+  useEffect(() => {
+    const fetchAgents = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`/agents?size=1000`);
+        const options = res?.data?.agents?.map((agent) => ({
+          value: agent.id,
+          label: agent.nameEn,
+        }));
+        setAgentOptions(options || []);
+      } catch (error) {
+        console.error("Failed to fetch doctors:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAgents();
+  }, [setLoading]);
+
+  return (
+    <Select
+    required
+      styles={customStyles}
+      value={defaultOption || ""}
+      options={agentOptions}
+      name="agent"
+      placeholder="Select a Agent"
+      onChange={onAgentChange}
       isSearchable
     />
   );
@@ -269,6 +354,7 @@ export const DegreeOptions = ({ onDegreeChange, defaultValue = "" }) => {
 
   return (
     <Select
+    required
       styles={customStyles}
       value={defaultOption || ""}
       options={degreeOptions}
@@ -280,6 +366,48 @@ export const DegreeOptions = ({ onDegreeChange, defaultValue = "" }) => {
   );
 };
 
+export const InvoiceOptions = ({ onInvoiceChange, defaultValue = "" }) => {
+  const [invoiceOptions, setInvoiceOptions] = useState([]);
+  const { setLoading } = useLoadingStore();
+  const defaultOption = invoiceOptions.find(
+    (option) => option.value === defaultValue
+  );
+
+
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(`/invoices`);
+        const options = res?.data?.invoices?.map((invoice) => ({
+          value: invoice?.id,
+          label: invoice?.patient?.fullName, 
+
+        }));
+        setInvoiceOptions(options || []);
+      } catch (error) {
+        console.error("Failed to fetch invoices:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInvoices();
+  }, [setLoading]);
+
+  return (
+    <Select
+      required
+      styles={customStyles}
+      value={defaultOption || ""}
+      options={invoiceOptions}
+      name="invoice"
+      placeholder="Select an Invoice"
+      onChange={onInvoiceChange}
+      isSearchable
+    />
+  );
+};
 // export const SpecialityOptions = ({
 //   onSpecialityChange,
 //   defaultValue = "",
@@ -371,6 +499,43 @@ export const BloodGroupOptions = () => {
     </>
   );
 };
+export const TransactionMethodOptions = () => {
+  const transactionMethods = [
+    { value: "CASH", display: "Cash" },
+    { value: "CARD", display: "Card" },
+    { value: "BIKASH", display: "Bikash" },
+    { value: "ROCKET", display: "Rocket" },
+    { value: "NAGAD", display: "Nagad" },
+    { value: "CHEQUE", display: "Cheque" },
+    { value: "BANK_TRANSFER", display: "Bank Transfer" },
+  ];
+  return (
+    <>
+      {transactionMethods.map((method) => (
+        <option key={method.value} value={method.value}>
+          {method.display}
+        </option>
+      ))}
+    </>
+  );
+};
+
+export const TransactionTypeOptions = () => {
+  const transactionTypes = [
+    { value: "DEBIT", display: "Debit" },
+    { value: "CREDIT", display: "Credit" },
+  ];
+  return (
+    <>
+      {transactionTypes.map((type) => (
+        <option key={type.value} value={type.value}>
+          {type.display}
+        </option>
+      ))}
+    </>
+  );
+};
+
 
 export const GenderOptions = () => {
   const genders = [
@@ -437,16 +602,46 @@ export const LeaveTypeOptions = () => {
     { value: "LEAVE_WITH_SALARY", display: "Leave With Salary" },
     { value: "LEAVE_WITHOUT_BENEFIT", display: "Leave Without Benefit" },
     { value: "LEAVE_WITH_BENEFIT", display: "Leave With Benefit" },
-    { value: "LEAVE_WITHOUT_ALLOWANCE_AND_BENEFIT", display: "Leave Without Allowance and Benefit" },
-    { value: "LEAVE_WITH_ALLOWANCE_AND_BENEFIT", display: "Leave With Allowance and Benefit" },
-    { value: "LEAVE_WITHOUT_SALARY_AND_BENEFIT", display: "Leave Without Salary and Benefit" },
-    { value: "LEAVE_WITH_SALARY_AND_BENEFIT", display: "Leave With Salary and Benefit" },
-    { value: "LEAVE_WITHOUT_ALLOWANCE_AND_SALARY", display: "Leave Without Allowance and Salary" },
-    { value: "LEAVE_WITH_ALLOWANCE_AND_SALARY", display: "Leave With Allowance and Salary" },
-    { value: "LEAVE_WITHOUT_BENEFIT_AND_SALARY", display: "Leave Without Benefit and Salary" },
-    { value: "LEAVE_WITH_BENEFIT_AND_SALARY", display: "Leave With Benefit and Salary" },
-    { value: "LEAVE_WITHOUT_ALLOWANCE_AND_BENEFIT_AND_SALARY", display: "Leave Without Allowance, Benefit, and Salary" },
-    { value: "LEAVE_WITH_ALLOWANCE_AND_BENEFIT_AND_SALARY", display: "Leave With Allowance, Benefit, and Salary" },
+    {
+      value: "LEAVE_WITHOUT_ALLOWANCE_AND_BENEFIT",
+      display: "Leave Without Allowance and Benefit",
+    },
+    {
+      value: "LEAVE_WITH_ALLOWANCE_AND_BENEFIT",
+      display: "Leave With Allowance and Benefit",
+    },
+    {
+      value: "LEAVE_WITHOUT_SALARY_AND_BENEFIT",
+      display: "Leave Without Salary and Benefit",
+    },
+    {
+      value: "LEAVE_WITH_SALARY_AND_BENEFIT",
+      display: "Leave With Salary and Benefit",
+    },
+    {
+      value: "LEAVE_WITHOUT_ALLOWANCE_AND_SALARY",
+      display: "Leave Without Allowance and Salary",
+    },
+    {
+      value: "LEAVE_WITH_ALLOWANCE_AND_SALARY",
+      display: "Leave With Allowance and Salary",
+    },
+    {
+      value: "LEAVE_WITHOUT_BENEFIT_AND_SALARY",
+      display: "Leave Without Benefit and Salary",
+    },
+    {
+      value: "LEAVE_WITH_BENEFIT_AND_SALARY",
+      display: "Leave With Benefit and Salary",
+    },
+    {
+      value: "LEAVE_WITHOUT_ALLOWANCE_AND_BENEFIT_AND_SALARY",
+      display: "Leave Without Allowance, Benefit, and Salary",
+    },
+    {
+      value: "LEAVE_WITH_ALLOWANCE_AND_BENEFIT_AND_SALARY",
+      display: "Leave With Allowance, Benefit, and Salary",
+    },
   ];
 
   return (
@@ -482,4 +677,3 @@ export const StatusOptions = () => {
     </>
   );
 };
-

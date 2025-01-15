@@ -118,7 +118,7 @@ const EditTestPage = () => {
             <div>
               <label className="form-label">Departments</label>
               <select name="department" className="form-input form-select">
-                <option value={test?.department?.nameEn || ""} selected>
+                <option value={test?.department?.id || ""} selected>
                   {test?.department?.nameEn
                     ? test?.department?.nameEn.charAt(0).toUpperCase() +
                       test?.department?.nameEn.slice(1).toLowerCase()

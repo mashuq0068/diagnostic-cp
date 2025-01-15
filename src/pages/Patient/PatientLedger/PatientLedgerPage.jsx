@@ -25,22 +25,23 @@ import useLoadingStore from "@/store/loadingStore";
 import { buildQueryParams } from "@/utility/buildQueryParams";
 import axios from "@/config/axiosConfig";
 import Pagination from "@/utility/Pagination";
+import PlaceHolder from "@/utility/PlaceHolder";
 
 const PatientLedgerPage = () => {
   const [patientLedgers, setPatientLedger] = useState([]);
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
   const [totalPages, setTotalPages] = useState(0);
   const { setLoading } = useLoadingStore();
   const [queryParams, setQueryParams] = useState({
     page: 0,
     size: 10,
-    fullName: "",
+    // fullName: "",
   });
   useEffect(() => {
     getAllPatientLedger();
   }, [queryParams]);
-console.log(patientLedgers);
-  const [dateFrom, setDateFrom] = useState(null);
-  const [dateTo, setDateTo] = useState(null);
+
   const getAllPatientLedger = async () => {
     setLoading(true);
     try {
@@ -62,7 +63,17 @@ console.log(patientLedgers);
       page: page,
     }));
   };
-
+  /// from frontend
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    if (!searchTerm) {
+      getAllPatientLedger();
+    }
+    const filtered = patientLedgers.filter((patientLedger) =>
+      patientLedger.patientName.toLowerCase().includes(searchTerm)
+    );
+    setPatientLedger(filtered);
+  };
   return (
     <div className="mb-8">
       <div>
@@ -80,6 +91,7 @@ console.log(patientLedgers);
             <div className="flex max-w-[350px] items-center xl:mb-0 mb-6  space-x-2 bg-[#EBF5FF] px-4 py-2 rounded-full flex-shrink-0 w-full sm:w-auto ">
               <FaSearch className="text-gray-500" />
               <input
+                onChange={handleSearchChange}
                 type="text"
                 placeholder="Search"
                 className="bg-transparent outline-none text-gray-600 w-full"
@@ -157,168 +169,176 @@ console.log(patientLedgers);
                 </tr>
               </thead>
               <tbody>
-                {patientLedgers?.map((ledger, index) => (
-                  <tr key={index} className="border-b hover:bg-gray-100">
-                    <td className="py-4">{ledger?.patientName}</td>
-                    <td className="py-4">
-                      {ledger?.transactionDate
-                        ? new Date(ledger.transactionDate).toLocaleString()
-                        : "N/A"}
-                    </td>
+                {patientLedgers?.length > 0 ? (
+                  patientLedgers?.map((ledger, index) => (
+                    <tr key={index} className="border-b hover:bg-gray-100">
+                      <td className="py-4">{ledger?.patientName}</td>
+                      <td className="py-4">
+                        {ledger?.transactionDate
+                          ? new Date(ledger.transactionDate).toLocaleString()
+                          : "N/A"}
+                      </td>
 
-                    <td>{ledger?.transactionType}</td>
-                    <td>{ledger?.transactionDetails}</td>
-                    <td>{ledger?.debit}</td>
-                    <td>{ledger?.credit}</td>
-                    <td>{ledger?.balance}</td>
-                    <td>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <button className="btn-outline">
-                            <IoInformation size={18} />
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[500px] bg-white rounded-lg shadow-lg p-6">
-                          <DialogHeader>
-                            <DialogTitle className="text-xl font-semibold text-gray-800">
-                              Patient Ledger Details
-                            </DialogTitle>
-                            <DialogDescription className="text-gray-500 text-sm">
-                              Complete information for this transaction.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <DialogDescription>
-                            <div className="grid grid-cols-1 gap-6">
-                              {/* Transaction Information Section */}
-                              <div className="p-4">
-                                <div className="w-full mb-6">
-                                  <h2 className="text-base text-black font-medium mb-2">
-                                    Transaction Information
-                                  </h2>
-                                  <div className="h-[2px] bg-gray-200">
-                                    <div className="h-[2px] bg-primary w-[210px]"></div>
+                      <td>{ledger?.transactionType}</td>
+                      <td>{ledger?.transactionDetails}</td>
+                      <td>{ledger?.debit}</td>
+                      <td>{ledger?.credit}</td>
+                      <td>{ledger?.balance}</td>
+                      <td>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <button className="btn-outline">
+                              <IoInformation size={18} />
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-[500px] bg-white rounded-lg shadow-lg p-6">
+                            <DialogHeader>
+                              <DialogTitle className="text-xl font-semibold text-gray-800">
+                                Patient Ledger Details
+                              </DialogTitle>
+                              <DialogDescription className="text-gray-500 text-sm">
+                                Complete information for this transaction.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogDescription>
+                              <div className="grid grid-cols-1 gap-6">
+                                {/* Transaction Information Section */}
+                                <div className="p-4">
+                                  <div className="w-full mb-6">
+                                    <h2 className="text-base text-black font-medium mb-2">
+                                      Transaction Information
+                                    </h2>
+                                    <div className="h-[2px] bg-gray-200">
+                                      <div className="h-[2px] bg-primary w-[210px]"></div>
+                                    </div>
+                                  </div>
+                                  <div className="space-y-4">
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Transaction Date:
+                                      </span>
+                                      {ledger?.transactionDate
+                                        ? new Date(
+                                            ledger.transactionDate
+                                          ).toLocaleString()
+                                        : "N/A"}
+                                    </p>
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Transaction Type:
+                                      </span>
+                                      {ledger?.transactionType || "N/A"}
+                                    </p>
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Transaction Details:
+                                      </span>
+                                      {ledger?.transactionDetails || "N/A"}
+                                    </p>
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Debit:
+                                      </span>
+                                      {ledger?.debit || 0}
+                                    </p>
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Credit:
+                                      </span>
+                                      {ledger?.credit || 0}
+                                    </p>
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Balance:
+                                      </span>
+                                      {ledger?.balance || 0}
+                                    </p>
                                   </div>
                                 </div>
-                                <div className="space-y-4">
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Transaction Date:
-                                    </span>
-                                    {ledger?.transactionDate
-                                      ? new Date(
-                                          ledger.transactionDate
-                                        ).toLocaleString()
-                                      : "N/A"}
-                                  </p>
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Transaction Type:
-                                    </span>
-                                    {ledger?.transactionType || "N/A"}
-                                  </p>
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Transaction Details:
-                                    </span>
-                                    {ledger?.transactionDetails || "N/A"}
-                                  </p>
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Debit:
-                                    </span>
-                                    {ledger?.debit || 0}
-                                  </p>
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Credit:
-                                    </span>
-                                    {ledger?.credit || 0}
-                                  </p>
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Balance:
-                                    </span>
-                                    {ledger?.balance || 0}
-                                  </p>
-                                </div>
-                              </div>
 
-                              {/* Payment Information Section */}
-                              <div className="p-4">
-                                <div className="w-full mb-6">
-                                  <h2 className="text-base text-black font-medium mb-2">
-                                    Payment Information
-                                  </h2>
-                                  <div className="h-[2px] bg-gray-200">
-                                    <div className="h-[2px] bg-primary w-[210px]"></div>
+                                {/* Payment Information Section */}
+                                <div className="p-4">
+                                  <div className="w-full mb-6">
+                                    <h2 className="text-base text-black font-medium mb-2">
+                                      Payment Information
+                                    </h2>
+                                    <div className="h-[2px] bg-gray-200">
+                                      <div className="h-[2px] bg-primary w-[210px]"></div>
+                                    </div>
+                                  </div>
+                                  <div className="space-y-4">
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Paid Amount:
+                                      </span>
+                                      {ledger?.paidAmount || 0}
+                                    </p>
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Due Amount:
+                                      </span>
+                                      {ledger?.dueAmount || 0}
+                                    </p>
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Discount Amount:
+                                      </span>
+                                      {ledger?.discountAmount || 0}
+                                    </p>
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Total Amount:
+                                      </span>
+                                      {ledger?.totalAmount || 0}
+                                    </p>
                                   </div>
                                 </div>
-                                <div className="space-y-4">
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Paid Amount:
-                                    </span>
-                                    {ledger?.paidAmount || 0}
-                                  </p>
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Due Amount:
-                                    </span>
-                                    {ledger?.dueAmount || 0}
-                                  </p>
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Discount Amount:
-                                    </span>
-                                    {ledger?.discountAmount || 0}
-                                  </p>
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Total Amount:
-                                    </span>
-                                    {ledger?.totalAmount || 0}
-                                  </p>
-                                </div>
-                              </div>
 
-                              {/* Patient Information Section */}
-                              <div className="p-4">
-                                <div className="w-full mb-6">
-                                  <h2 className="text-base text-black font-medium mb-2">
-                                    Patient Information
-                                  </h2>
-                                  <div className="h-[2px] bg-gray-200">
-                                    <div className="h-[2px] bg-primary w-[210px]"></div>
+                                {/* Patient Information Section */}
+                                <div className="p-4">
+                                  <div className="w-full mb-6">
+                                    <h2 className="text-base text-black font-medium mb-2">
+                                      Patient Information
+                                    </h2>
+                                    <div className="h-[2px] bg-gray-200">
+                                      <div className="h-[2px] bg-primary w-[210px]"></div>
+                                    </div>
                                   </div>
-                                </div>
-                                <div className="space-y-4">
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Patient Name:
-                                    </span>
-                                    {ledger?.patientName|| "N/A"}
-                                  </p>
-                                  {/* <p className="text-gray-600">
+                                  <div className="space-y-4">
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Patient Name:
+                                      </span>
+                                      {ledger?.patientName || "N/A"}
+                                    </p>
+                                    {/* <p className="text-gray-600">
                                     <span className="font-medium mr-1">
                                       Patient ID:
                                     </span>
                                     {ledger?.patient?.id || "N/A"}
                                   </p> */}
-                                  <p className="text-gray-600">
-                                    <span className="font-medium mr-1">
-                                      Is Active:
-                                    </span>
-                                    {ledger?.isActive ? "Yes" : "No"}
-                                  </p>
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Is Active:
+                                      </span>
+                                      {ledger?.isActive ? "Yes" : "No"}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </DialogDescription>
-                        </DialogContent>
-                      </Dialog>
+                            </DialogDescription>
+                          </DialogContent>
+                        </Dialog>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="12" className="py-8 text-center">
+                      <PlaceHolder />
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

@@ -41,6 +41,7 @@ import {
   GenderOptions,
 } from "@/utility/SelectOptions";
 import toast from "react-hot-toast";
+import { capitalizeWords } from "@/utility/capitalizeWords";
 
 // initial State For Form Data
 const initialState = {
@@ -71,7 +72,7 @@ const EmployeeManagementPage = () => {
   const [queryParams, setQueryParams] = useState({
     page: 0,
     size: 10,
-    nameEn:""
+    nameEn: "",
   });
   // useEffect
   useEffect(() => {
@@ -107,6 +108,8 @@ const EmployeeManagementPage = () => {
     try {
       await axios.post("/employees", formData);
       toast.success("Employee Created Successfully");
+      setShowForm(false);
+      getAllEmployees();
       // clearing current data
       setFormData({ ...initialState });
     } catch (error) {
@@ -122,20 +125,31 @@ const EmployeeManagementPage = () => {
     try {
       await axios.delete(`/employees/${id}`);
       toast.success("Employee Deleted Successfully");
-      getAllEmployees()
+      getAllEmployees();
     } catch (error) {
-      console.log(error);
+      toast.error("Delete is not permissible");
     } finally {
       setLoading(false);
     }
   };
   // search
-  const handleSearchSubmit =(e) => {
-    e.preventDefault()
-    const searchTerm = e.target.search.value 
-    setQueryParams({...queryParams , nameEn : searchTerm})
-  }
-  
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    // const searchTerm = e.target.search.value;
+    // setQueryParams({ ...queryParams, nameEn: searchTerm });
+  };
+
+  /// from frontend
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    if (!searchTerm) {
+      getAllEmployees();
+    }
+    const filtered = employees.filter((employee) =>
+      employee.nameEn.toLowerCase().includes(searchTerm)
+    );
+    setEmployees(filtered);
+  };
   return (
     <div className="mb-8 ">
       <div>
@@ -175,22 +189,6 @@ const EmployeeManagementPage = () => {
         {showForm ? (
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {/* Name (Bangla) */}
-              <div>
-                <label className="form-label">Name (Bangla)</label>
-                <input
-                  required
-                  type="text"
-                  name="nameBn"
-                  value={formData.nameBn}
-                  onChange={(e) => {
-                    setFormData({ ...formData, nameBn: e.target.value });
-                  }}
-                  className="form-input"
-                  placeholder="Enter name in Bangla"
-                />
-              </div>
-
               {/* Name (English) */}
               <div>
                 <label className="form-label">Name (English)</label>
@@ -204,6 +202,21 @@ const EmployeeManagementPage = () => {
                   }}
                   className="form-input"
                   placeholder="Enter name in English"
+                />
+              </div>
+              {/* Name (Bangla) */}
+              <div>
+                <label className="form-label">Name (Bangla)</label>
+                <input
+                  required
+                  type="text"
+                  name="nameBn"
+                  value={formData.nameBn}
+                  onChange={(e) => {
+                    setFormData({ ...formData, nameBn: e.target.value });
+                  }}
+                  className="form-input"
+                  placeholder="Enter name in Bangla"
                 />
               </div>
 
@@ -271,7 +284,7 @@ const EmployeeManagementPage = () => {
                 <label className="form-label">NID</label>
                 <input
                   required
-                  type="text"
+                  type="number"
                   name="nid"
                   value={formData.nid}
                   onChange={(e) => {
@@ -287,7 +300,7 @@ const EmployeeManagementPage = () => {
                 <label className="form-label">Phone</label>
                 <input
                   required
-                  type="tel"
+                  type="number"
                   name="phone"
                   value={formData.phone}
                   onChange={(e) => {
@@ -388,7 +401,7 @@ const EmployeeManagementPage = () => {
                 <label className="form-label">Salary</label>
                 <input
                   required
-                  type="text"
+                  type="number"
                   name="salary"
                   value={formData.salary}
                   onChange={(e) => {
@@ -412,24 +425,25 @@ const EmployeeManagementPage = () => {
           <>
             <div className="flex mb-5 md:space-x-6 md:space-y-0 space-y-3 flex-wrap">
               {/* Search Input */}
-          <form onSubmit={handleSearchSubmit}>
-            <div className="flex py-2 items-center  space-x-2 bg-[#EBF5FF] px-4  rounded-full flex-shrink-0 w-full sm:w-auto mb-5 sm:mb-0">
-              <FaSearch className="text-gray-500" />
-              <input
-                type="text"
-                name="search"
-                placeholder="Search"
-                className="bg-transparent outline-none text-gray-600 w-full"
-              />
-            </div>
-          </form>
+              <form onSubmit={handleSearchSubmit}>
+                <div className="flex py-2 items-center  space-x-2 bg-[#EBF5FF] px-4  rounded-full flex-shrink-0 w-full sm:w-auto mb-5 sm:mb-0">
+                  <FaSearch className="text-gray-500" />
+                  <input
+                    onChange={handleSearchChange}
+                    type="text"
+                    name="search"
+                    placeholder="Search"
+                    className="bg-transparent outline-none text-gray-600 w-full"
+                  />
+                </div>
+              </form>
             </div>
             <div className="table-responsive">
               <table className="table min-w-full">
                 <thead>
                   <tr className="text-left text-gray-800 border-b">
                     <th className="py-2">Employee Name</th>
-                    <th>Age</th>
+                    {/* <th>Age</th> */}
                     <th>Gender</th>
                     <th>Blood Group</th>
                     <th>Phone Number</th>
@@ -452,16 +466,20 @@ const EmployeeManagementPage = () => {
                           />
                           <span>{employee?.nameEn}</span>
                         </td>
-                        <td>
+                        {/* <td>
                           {new Date().getFullYear() -
                             new Date(employee?.dateOfBirth).getFullYear()}
+                        </td> */}
+                        <td>
+                          {employee?.gender
+                            ? capitalizeWords(employee?.gender)
+                            : "N/A"}
                         </td>
                         <td>
-                          {employee?.gender === "MALE"
-                            ? "Male"
-                            : "Female" || "N/A"}
+                          {employee?.bloodGroup
+                            ? capitalizeWords(employee?.bloodGroup)
+                            : "N/A"}
                         </td>
-                        <td>{employee?.bloodGroup || "N/A"}</td>
                         <td>{employee?.phone || "N/A"}</td>
                         <td>{employee?.email || "N/A"}</td>
                         <td className="flex space-x-2">
@@ -646,8 +664,8 @@ const EmployeeManagementPage = () => {
                                   Are you absolutely sure?
                                 </AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This action cannot be undone.Because, This will
-                                  permanently delete your data.
+                                  This action cannot be undone.Because, This
+                                  will permanently delete your data.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>

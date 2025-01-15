@@ -10,7 +10,7 @@ import { BloodGroupOptions, GenderOptions } from "@/utility/SelectOptions";
 const EditPatientPage = () => {
   const [diabetics, setDiabetics] = useState(false);
   const [patient, setPatient] = useState(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { setLoading } = useLoadingStore();
   const params = useParams();
   useEffect(() => {
@@ -43,22 +43,23 @@ const EditPatientPage = () => {
       dateOfBirth: form.dateOfBirth.value,
       phone: form.phone.value,
       email: form.email.value,
-      gender: form.gender.value,
+      gender: form.gender.value || null,
       // districtId: form.district.value,
       // upazilaId: form.upazila.value,
       emergencyContact: form.emergencyContact.value,
       weight: Number(form.weight.value),
       height: Number(form.height.value),
-      bloodGroup: form.bloodGroup.value,
+      bloodGroup: form.bloodGroup.value || null,
       medicalHistory: form.medicalHistory.value,
       isDiabetic: diabetics,
     };
+    console.log(updatedPatient);
     setLoading(true);
-    
+
     try {
       await axios.put(`/patients/${params?.id}`, updatedPatient);
       toast.success("Patient profile updated successfully!");
-      navigate('/patient/view-patients')
+      navigate("/patient/view-patients");
     } catch (error) {
       toast.error(error?.message || "Something went wrong");
     } finally {
@@ -150,16 +151,20 @@ const EditPatientPage = () => {
             <div>
               <label className="form-label">Gender</label>
               <select
-                defaultValue={patient?.gender || ""}
+                defaultValue={patient?.gender || null}
                 name="gender"
                 className="form-input"
               >
-                <option value={patient?.gender || "Choose"} selected>
-                  {patient?.gender
-                    ? patient?.gender.charAt(0).toUpperCase() +
-                      patient?.gender.slice(1).toLowerCase()
-                    : "Choose"}
-                </option>
+                {patient?.gender ? (
+                  <option value={patient?.gender} selected>
+                    {patient?.gender?.charAt(0).toUpperCase() +
+                      patient?.gender?.slice(1).toLowerCase()}
+                  </option>
+                ) : (
+                  <option value={""} disabled selected>
+                    Choose
+                  </option>
+                )}
                 <GenderOptions />
               </select>
             </div>
@@ -170,10 +175,10 @@ const EditPatientPage = () => {
               <select
                 name="district"
                 className="form-input form-select"
-                defaultValue={patient?.districtId?.nameEn || ""}
+                defaultValue={patient?.districtId?.nameEn || null}
               >
                 <option
-                  value={patient?.districtId?.nameEn || ""}
+                  value={patient?.districtId?.nameEn || null}
                   disabled
                   className="text-gray-300"
                 >
@@ -199,9 +204,9 @@ const EditPatientPage = () => {
               <select
                 name="upazila"
                 className="form-input form-select"
-                defaultValue={patient?.upazillaId?.nameEn || ""}
+                defaultValue={patient?.upazillaId?.nameEn || null}
               >
-                <option value={patient?.upazillaId?.nameEn || ""} disabled>
+                <option value={patient?.upazillaId?.nameEn || null} disabled>
                   {patient?.upazillaId?.nameEn
                     ? patient?.upazillaId?.nameEn.charAt(0).toUpperCase() +
                       patient?.upazillaId?.nameEn.slice(1).toLowerCase()
@@ -258,16 +263,20 @@ const EditPatientPage = () => {
             <div>
               <label className="form-label">Blood Group</label>
               <select
-                defaultValue={patient?.bloodGroup}
+                defaultValue={patient?.bloodGroup || null}
                 name="bloodGroup"
                 className="form-input"
               >
-                <option value={patient?.bloodGroup || "Choose"}>
-                  {patient?.bloodGroup
-                    ? patient?.bloodGroup.charAt(0).toUpperCase() +
-                      patient?.bloodGroup.slice(1).toLowerCase()
-                    : "Choose"}
-                </option>
+                {patient?.bloodGroup ? (
+                  <option value={patient?.bloodGroup} selected>
+                    {patient?.bloodGroup?.charAt(0).toUpperCase() +
+                      patient?.bloodGroup?.slice(1).toLowerCase()}
+                  </option>
+                ) : (
+                  <option value={""} disabled selected>
+                    Choose
+                  </option>
+                )}
                 <BloodGroupOptions />
               </select>
             </div>
@@ -288,8 +297,8 @@ const EditPatientPage = () => {
                 <input
                   type="checkbox"
                   name="isDiabetic"
-                  defaultValue={patient?.isDiabetic}
-                  // checked={patient?.isDiabetic}
+                 
+                  checked={patient?.isDiabetic}
                   onChange={() => setDiabetics(!diabetics)}
                   className="sr-only peer"
                 />

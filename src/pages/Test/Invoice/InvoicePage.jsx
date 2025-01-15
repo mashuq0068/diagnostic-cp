@@ -22,6 +22,9 @@ import useLoadingStore from "@/store/loadingStore";
 import axios from "@/config/axiosConfig";
 import { calculateMoney } from "@/utility/calculateMoney";
 import { buildQueryParams } from "@/utility/buildQueryParams";
+import { GenderOptions } from "@/utility/SelectOptions";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const InvoicePage = () => {
   const [currentPatient, setCurrentPatient] = useState("");
@@ -42,14 +45,16 @@ const InvoicePage = () => {
   const [dueAmount, setDueAmount] = useState(null);
   const { setLoading } = useLoadingStore();
   const [patientData, setPatientData] = useState({
-    name: null,
+    fullName: null,
     address: null,
-    phoneNumber: null,
+    gender: null,
+    phone: null,
+    email: null,
   });
   const [patientQueryParams, setPatinetQueryParams] = useState({
     fullName: "",
     phone: "",
-    size:1000
+    size: 1000,
   });
   const [doctorQueryParams, setDoctorQueryParams] = useState({
     nameEn: "",
@@ -67,22 +72,32 @@ const InvoicePage = () => {
   // create patient
   const handleCreatePatient = async () => {
     setLoading(true);
+    console.log(patientData);
+
     if (
-      !patientData.name ||
+      !patientData.fullName ||
       !patientData.address ||
-      !patientData.phoneNumber 
-      
+      !patientData.phone ||
+      !patientData.gender
     ) {
       toast.error("Please fill  all required fields.");
       setLoading(false);
       return;
     }
 
+    console.log(patientData);
     try {
       await axios.post("/patients", patientData);
       toast.success("Patient Created Successfully!");
       // Clear the form after successful submission
-      setPatientData({ name: "", address: "", phoneNumber: "", email: "" });
+      setPatientData({
+        fullName: null,
+        address: null,
+        phone: null,
+        email: null,
+        gender: null,
+      });
+      getAllPatients();
     } catch (error) {
       toast.error(error.message || "Something went wrong.");
     } finally {
@@ -202,7 +217,7 @@ const InvoicePage = () => {
       total;
 
     setTotalAmount(total);
-    setCurrentAmount(selectedDoctor ? current : total);
+    setCurrentAmount(selectedDoctor || selectedAgent ? current : total);
     // if after giving paid amount anyone add a test, then due amount will change
     if (paidAmount) {
       setDueAmount(current - paidAmount);
@@ -364,12 +379,142 @@ const InvoicePage = () => {
       };
       await axios.post("/invoices", invoiceData);
       toast.success("Invoice Created Successfully");
+      generateInvoiceReport(currentPatient, addedTests);
     } catch (error) {
       toast.error(error.message || "something wrong");
       setLoading(false);
     } finally {
       setLoading(false);
     }
+  };
+
+  const generateInvoiceReport = (patient, tests) => {
+    const input = document.createElement("div");
+    input.style.position = "absolute";
+    input.style.left = "-9999px";
+    input.className = "w-[210mm] bg-white";
+    input.innerHTML = `
+          <div class="">
+              <!-- Header Section -->
+              <div class="flex bg-gray-200 text-black justify-between items-start border-b-2 pb-6 mb-8 shadow-lg rounded-lg p-8">
+                  <div class="space-y-4">
+                      <h1 class="text-2xl font-bold tracking-tight">Diagnostic Center</h1>
+                      <div class="text-sm">
+                          <p>Phone: <span class="font-medium">564-555-1234</span></p>
+                          <p>Email: <span class="font-medium">your@email.com</span></p>
+                          <p>Address: <span class="font-medium">123 Your Street, City, State, ZIP CODE</span></p>
+                      </div>
+                  </div>
+                  <div class="text-right space-y-3">
+                      <h2 class="text-3xl font-semibold uppercase tracking-wide">Invoice</h2>
+                      <div class="text-sm">
+                          <p>Invoice Number: <span class="font-medium">INV-${Date.now()}</span></p>
+                          <p>Date of Issue: <span class="font-medium">${new Date().toLocaleDateString()}</span></p>
+                      </div>
+                  </div>
+              </div>
+              
+              <div class="p-8 pb-16">
+              <!-- Patient Details Section -->
+              <div class="mb-8">
+                  <h3 class="text-lg font-semibold mb-2">Patient Details</h3>
+                  <div class=" space-y-1">
+                      <p>Name: <span class="font-medium">${
+                        patient?.fullName
+                      }</span></p>
+                      <p>Age: <span class="font-medium">${
+                        new Date().getFullYear() -
+                          new Date(patient?.user?.dateOfBirth).getFullYear() ||
+                        "N/A"
+                      }</span></p>
+                      <p>Gender: <span class="font-medium">${
+                        patient?.gender || "N/A"
+                      }</span></p>
+                      <p>Address: <span class="font-medium">${
+                        patient?.address || "N/A"
+                      }</span></p>
+                      <p>Phone: <span class="font-medium">${
+                        patient?.phone || "N/A"
+                      }</span></p>
+                  </div>
+              </div>
+  
+              <!-- Test Details Section -->
+              <div class="mb-8">
+                  <h3 class="text-lg font-semibold mb-6">Invoice Details</h3>
+                  <table class="min-w-full border border-gray-300">
+                      <thead class="bg-primary text-left text-white">
+                          <tr>
+                              <th class="pb-4 border-white border-b align-middle">Serial No</th>
+                              <th class="pb-4 border-white border-b align-middle">Test Name</th>
+                              <th class="pb-4 border-white border-b align-middle">Price</th>
+                              <th class="pb-4 border-white border-b align-middle">Final Price</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          ${tests
+                            .map(
+                              (test, index) => `
+                              <tr class="bg-gray-100">
+                                  <td class="pb-6 border-gray-400 border-b align-middle">${
+                                    index + 1
+                                  }</td>
+                                  <td class="pb-6 border-gray-400 border-b align-middle">${
+                                    test.name
+                                  }</td>
+                                  <td class="pb-6 border-gray-400 border-b align-middle">${
+                                    test.price
+                                  }</td>
+                                  <td class="pb-6 border-gray-400 border-b align-middle">${
+                                    test.finalPrice
+                                  }</td>
+                              </tr>`
+                            )
+                            .join("")}
+                      </tbody>
+                  </table>
+              </div>
+  
+      <!-- Summary Section -->
+<div class="p-6 bg-gray-100 rounded-lg shadow-md">
+  <div class="flex justify-between items-center">
+    <div>
+      <p>Subtotal: <span>$${currentAmount}</span></p>
+      <p>Tax (5%): <span>$${(currentAmount * 0.05).toFixed(2)}</span></p>
+    </div>
+    <div class="text-center">
+      <p>Paid Amount</p>
+      <p>${paidAmount}TK</p>
+    </div>
+    <div class="text-center">
+      <p>Due Amount</p>
+      <p>${dueAmount}TK</p>
+    </div>
+    <div class="text-right">
+      <p>Total</p>
+      <p>${currentAmount}TK</p>
+    </div>
+  </div>
+</div>
+
+<!-- Footer Section -->
+<div class="mt-8">
+  <p>Terms and Conditions: Services rendered are non-refundable. Please contact us for any discrepancies.</p>
+</div>
+
+          </div>
+      `;
+    document.body.appendChild(input);
+
+    html2canvas(input, { scale: 2 }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("invoice.pdf");
+      document.body.removeChild(input);
+    });
   };
 
   // handle delete test
@@ -449,7 +594,7 @@ const InvoicePage = () => {
                   <DialogDescription>
                     <form>
                       {/* Form Grid */}
-                      <div className="grid grid-cols-1 text-[16px] mt-4 gap-4">
+                      <div className="grid text-black grid-cols-1 text-[16px] mt-4 gap-4">
                         {/* Name */}
                         <div>
                           <label className="form-label">Name</label>
@@ -462,7 +607,7 @@ const InvoicePage = () => {
                             onChange={(e) =>
                               setPatientData((prevData) => ({
                                 ...prevData,
-                                name: e.target.value,
+                                fullName: e.target.value,
                               }))
                             }
                           />
@@ -485,20 +630,38 @@ const InvoicePage = () => {
                             }
                           />
                         </div>
+                        {/* Gender */}
+                        <div>
+                          <label className="form-label">Gender</label>
+                          <select
+                            onChange={(e) => {
+                              setPatientData({
+                                ...patientData,
+                                gender: e.target.value,
+                              });
+                            }}
+                            required
+                            name="gender"
+                            className="form-input"
+                          >
+                            <option value="">Choose</option>
+                            <GenderOptions />
+                          </select>
+                        </div>
 
                         {/* Phone Number */}
                         <div>
                           <label className="form-label">Phone Number</label>
                           <input
-                            type="tel"
-                            name="phoneNumber"
+                            type="number"
+                            name="phone"
                             placeholder="Enter your phone number"
                             className="form-input"
-                            value={patientData.phoneNumber}
+                            value={patientData.phone}
                             onChange={(e) =>
                               setPatientData((prevData) => ({
                                 ...prevData,
-                                phoneNumber: e.target.value,
+                                phone: e.target.value,
                               }))
                             }
                           />
@@ -701,7 +864,10 @@ const InvoicePage = () => {
                                   <input
                                     type="text"
                                     onChange={(e) =>
-                                      handleAgentPercentageChange(e, test.testId)
+                                      handleAgentPercentageChange(
+                                        e,
+                                        test.testId
+                                      )
                                     }
                                     max={selectedAgent.commissionPercentage}
                                     defaultValue={
@@ -718,7 +884,10 @@ const InvoicePage = () => {
                                   <input
                                     type="text"
                                     onChange={(e) =>
-                                      handleDoctorPercentageChange(e, test.testId)
+                                      handleDoctorPercentageChange(
+                                        e,
+                                        test.testId
+                                      )
                                     }
                                     max={selectedDoctor.commissionPercentage}
                                     defaultValue={

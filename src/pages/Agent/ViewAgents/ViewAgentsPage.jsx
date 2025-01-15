@@ -41,7 +41,7 @@ const ViewAgentsPage = () => {
   const [queryParams, setQueryParams] = useState({
     page: 0,
     size: 10,
-    nameEn:""
+    nameEn: "",
   });
   useEffect(() => {
     getAllAgents();
@@ -77,27 +77,38 @@ const ViewAgentsPage = () => {
     try {
       await axios.delete(`/agents/${id}`);
       toast.success("Agent Deleted Successfully");
-      getAllAgents()
+      getAllAgents();
     } catch (error) {
-      console.log(error)
-      toast.error("Delete Process Failed")
+      console.log(error);
+      toast.error("Delete is not permissible");
     } finally {
       setLoading(false);
     }
   };
-  const handleSearchSubmit =(e) => {
-    e.preventDefault()
-    const searchTerm = e.target.search.value 
-    setQueryParams({...queryParams , nameEn : searchTerm})
-  }
-
+  // backend search
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    // const searchTerm = e.target.search.value;
+    // setQueryParams({ ...queryParams, nameEn: searchTerm });
+  };
+  // from forntend search
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    if (!searchTerm) {
+      getAllAgents();
+    }
+    const filtered = agents.filter((agent) =>
+      agent.nameEn.toLowerCase().includes(searchTerm)
+    );
+    setAgents(filtered);
+  };
   return (
     <div className="mb-8 ">
       <div>
         <SectionHeader title={"View agents"} />
       </div>
       <div className="wrapper">
-      <div className="w-full mb-6">
+        <div className="w-full mb-6">
           <div className="flex justify-between items-end gap-3 flex-wrap">
             <h2 className="text-base flex justify-between  flex-col font-medium mb-2">
               All Agents List
@@ -122,6 +133,7 @@ const ViewAgentsPage = () => {
             <div className="flex py-2 items-center  space-x-2 bg-[#EBF5FF] px-4  rounded-full flex-shrink-0 w-full sm:w-auto mb-5 sm:mb-0">
               <FaSearch className="text-gray-500" />
               <input
+                onChange={handleSearchChange}
                 type="text"
                 name="search"
                 placeholder="Search"
@@ -138,8 +150,8 @@ const ViewAgentsPage = () => {
               <thead>
                 <tr className="text-left text-gray-800 border-b">
                   <th className="py-2">agent Name</th>
-                  <th>Age</th>
-                  <th>Gender</th>
+                  {/* <th>Age</th> */}
+                  {/* <th>Gender</th> */}
                   <th>Phone Number</th>
                   <th>Email ID</th>
                   <th>Commission(%)</th>
@@ -161,14 +173,14 @@ const ViewAgentsPage = () => {
                         />
                         <span>{agent?.nameEn}</span>
                       </td>
-                      <td>
+                      {/* <td>
                         {new Date().getFullYear() -
                           new Date(agent?.user?.dateOfBirth).getFullYear() ||
                           "----"}
-                      </td>
-                      <td>{agent?.gender || "----"}</td>
+                      </td> */}
+                      {/* <td>{agent?.gender || "----"}</td> */}
                       <td>{agent?.phone || "----"}</td>
-                      <td>{agent?.user?.email || "----"}</td>
+                      <td>{agent?.email || "----"}</td>
                       <td>{agent?.commissionPercentage || "----"}</td>
                       <td className="flex space-x-2">
                         <Dialog>
@@ -221,13 +233,13 @@ const ViewAgentsPage = () => {
                                       <span className="font-medium mr-1">
                                         District:
                                       </span>
-                                      {agent?.district?.name || "----"}
+                                      {agent?.districtId?.name || "----"}
                                     </p>
                                     <p className="text-gray-600">
                                       <span className="font-medium mr-1">
                                         Upazila:
                                       </span>
-                                      {agent?.upazila?.name || "----"}
+                                      {agent?.upazilaId?.name || "----"}
                                     </p>
                                   </div>
                                 </div>
@@ -289,7 +301,7 @@ const ViewAgentsPage = () => {
                                       <span className="font-medium mr-1">
                                         Initial Balance:
                                       </span>
-                                      {agent?.initialBalance || "----"}
+                                      {agent?.total_balance || "----"}
                                     </p>
                                     <p className="text-gray-600">
                                       <span className="font-medium mr-1">

@@ -38,7 +38,7 @@ import { BiPlus } from "react-icons/bi";
 
 const ViewDoctorsPage = () => {
   const [doctors, setDoctors] = useState([]);
-  
+
   const [totalPages, setTotalPages] = useState(0);
   const { setLoading } = useLoadingStore();
   const [queryParams, setQueryParams] = useState({
@@ -78,17 +78,28 @@ const ViewDoctorsPage = () => {
       toast.success("Doctor Deleted Successfully");
       getAllDoctors();
     } catch (error) {
-      console.log(error);
+      toast.error("Delete is not permissible");
     } finally {
       setLoading(false);
     }
   };
-  // search submit
-  const handleSearchSubmit =(e) => {
-    e.preventDefault()
-    const searchTerm = e.target.search.value 
-    setQueryParams({...queryParams , nameEn : searchTerm})
-  }
+  // search from backend
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    // const searchTerm = e.target.search.value
+    // setQueryParams({...queryParams , nameEn : searchTerm})
+  };
+  // search from frontend
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    if (!searchTerm) {
+      getAllDoctors();
+    }
+    const filtered = doctors.filter((doctor) =>
+      doctor.nameEn.toLowerCase().includes(searchTerm)
+    );
+    setDoctors(filtered);
+  };
 
   return (
     <div className="mb-8 ">
@@ -121,6 +132,7 @@ const ViewDoctorsPage = () => {
             <div className="flex py-2 items-center  space-x-2 bg-[#EBF5FF] px-4  rounded-full flex-shrink-0 w-full sm:w-auto mb-5 sm:mb-0">
               <FaSearch className="text-gray-500" />
               <input
+                onChange={handleSearchChange}
                 type="text"
                 name="search"
                 placeholder="Search"
@@ -137,9 +149,9 @@ const ViewDoctorsPage = () => {
               <thead>
                 <tr className="text-left text-black border-b">
                   <th className="py-2">Doctor Name</th>
-                  <th>Age</th>
-                  <th>Gender</th>
-                  <th>Blood Group</th>
+                  {/* <th>Age</th> */}
+                  {/* <th>Gender</th> */}
+                  {/* <th>Blood Group</th> */}
                   <th>Phone Number</th>
                   <th>Email ID</th>
                   <th>Availability</th>
@@ -161,13 +173,13 @@ const ViewDoctorsPage = () => {
                         />
                         <span>{doctor?.nameEn}</span>
                       </td>
-                      <td>
+                      {/* <td>
                         {new Date().getFullYear() -
                           new Date(doctor?.user?.dateOfBirth).getFullYear() ||
                           "----"}
-                      </td>
-                      <td>{doctor?.user?.gender || "----"}</td>
-                      <td>{doctor?.user?.bloodGroup || "----"}</td>
+                      </td> */}
+                      {/* <td>{doctor?.user?.gender || "----"}</td> */}
+                      {/* <td>{doctor?.user?.bloodGroup || "----"}</td> */}
                       <td>{doctor?.phone || "----"}</td>
                       <td>{doctor?.user?.email || "----"}</td>
                       <td>
@@ -319,7 +331,7 @@ const ViewDoctorsPage = () => {
                                       <span className="font-medium mr-1">
                                         Initial Balance:
                                       </span>
-                                      {doctor?.initialBalance || "----"}
+                                      {doctor?.total_balance || "----"}
                                     </p>
                                     <p className="text-gray-600">
                                       <span className="font-medium mr-1">

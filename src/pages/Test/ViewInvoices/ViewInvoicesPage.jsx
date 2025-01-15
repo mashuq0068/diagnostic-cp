@@ -80,11 +80,22 @@ const ViewInvoicesPage = () => {
       toast.success("Invoice Deleted Successfully");
       getAllInvoices();
     } catch (error) {
-      console.log(error);
-      toast.error("Failed to delete")
+      toast.error("Delete is not permissible");
     } finally {
       setLoading(false);
     }
+  };
+  /// from frontend
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    console.log(searchTerm);
+    if (!searchTerm) {
+      getAllInvoices();
+    }
+    const filtered = invoices.filter((invoice) =>
+      invoice?.patient?.fullName?.toLowerCase().includes(searchTerm)
+    );
+    setInvoices(filtered);
   };
   return (
     <div className="mb-8 ">
@@ -115,6 +126,7 @@ const ViewInvoicesPage = () => {
             <div className="flex py-2 items-center  space-x-2 bg-[#EBF5FF] px-4  rounded-full flex-shrink-0 w-full sm:w-auto mb-5 sm:mb-0">
               <FaSearch className="text-gray-500" />
               <input
+                onChange={handleSearchChange}
                 type="text"
                 placeholder="Search"
                 className="bg-transparent outline-none text-gray-600 w-full"
@@ -172,9 +184,12 @@ const ViewInvoicesPage = () => {
                             <div className="grid grid-cols-1 gap-4">
                               {/* Invoice Information */}
                               <div className="wrapper shadow-none p-4">
-                               <div>
-                                <TableHeader title={"Invoice Information"} selectedWidth={"w-[200px]"}/>
-                               </div>
+                                <div>
+                                  <TableHeader
+                                    title={"Invoice Information"}
+                                    selectedWidth={"w-[200px]"}
+                                  />
+                                </div>
                                 <div className="space-y-2">
                                   <p className="text-gray-600">
                                     <span className="font-medium mr-1">
@@ -206,13 +221,13 @@ const ViewInvoicesPage = () => {
                                     <span className="font-medium mr-1">
                                       Discount:
                                     </span>
-                                    {invoice?.discount }
+                                    {invoice?.discount}
                                   </p>
                                   <p className="text-gray-600">
                                     <span className="font-medium mr-1">
                                       Due Amount:
                                     </span>
-                                    {invoice?.dueAmount }
+                                    {invoice?.dueAmount}
                                   </p>
                                   <p className="text-gray-600">
                                     <span className="font-medium mr-1">

@@ -2,7 +2,7 @@
 import SectionHeader from "@/components/ui/section-header";
 import useLoadingStore from "@/store/loadingStore";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "@/config/axiosConfig";
 import { TbPlus, TbTrash } from "react-icons/tb";
 import { CiEdit } from "react-icons/ci";
@@ -39,6 +39,7 @@ const EditDoctorPage = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const navigate = useNavigate()
 
   const [speciality, setSpeciality] = useState();
   const { setLoading } = useLoadingStore();
@@ -53,12 +54,12 @@ const EditDoctorPage = () => {
     institutionId: null,
     startDate: null,
     endDate: null,
+    description: null,
   });
   const [doctor, setDoctor] = useState(null);
   const [educationList, setEducationList] = useState([]);
   const [timeSlots, setTimeSlots] = useState([]);
-  console.log(educationList);
-
+console.log(doctor);
   // useEffect
   useEffect(() => {
     getSelectedDoctor();
@@ -119,7 +120,6 @@ const EditDoctorPage = () => {
     console.log(timeSlots);
     try {
       await axios.post(`/doctors/${params.id}/schedules`, timeSlots);
-
       toast.success("Time Slots Saved Successfully");
     } catch (error) {
       console.error("Error saving time slots:", error);
@@ -151,7 +151,6 @@ const EditDoctorPage = () => {
     setLoading(true);
     try {
       const res = await axios.get(`/doctors/${params.id}/degrees`);
-      console.log(res);
       setEducationList(res?.data);
     } catch (error) {
       console.log(error);
@@ -167,7 +166,7 @@ const EditDoctorPage = () => {
       toast.error("All fields are required!");
       return;
     }
-
+    console.log(educationForm);
     setLoading(true);
     try {
       await axios.post(`/doctors/${params.id}/degrees`, educationForm);
@@ -177,8 +176,10 @@ const EditDoctorPage = () => {
         institutionId: null,
         startDate: null,
         endDate: null,
+        description: null,
       });
       setIsAddModalOpen(false);
+      getDoctorEducation();
       setLoading(false);
     } catch (error) {
       console.error("Error adding education:", error);
@@ -190,26 +191,28 @@ const EditDoctorPage = () => {
   };
   // Validate modal inputs and add to educationList
   const handleEditEducation = async (education) => {
-    setLoading(true);
     try {
-      const educationForm = {
+      setLoading(true);
+      const educationData = {
         degreeId: educationForm.degreeId || education?.degreeId,
         institutionId: educationForm.institutionId || education?.institutionId,
         startDate: educationForm.startDate || education?.startDate,
         endDate: educationForm.endDate || education?.endDate,
+        description: education?.description,
       };
-      await axios.put(`/doctors/${params.id}/degrees`, educationForm);
+      await axios.put(`/doctors/${params.id}/degrees`, educationData);
       toast.success("Education updated successfully!");
       setEducationForm({
         degreeId: null,
         institutionId: null,
         startDate: null,
         endDate: null,
+        description: null,
       });
-      setIsAddModalOpen(false);
+      getDoctorEducation();
+      setIsEditModalOpen(false);
       setLoading(false);
     } catch (error) {
-      console.error("Error adding education:", error);
       toast.error("An error occurred while adding education.");
       setLoading(false);
     } finally {
@@ -221,11 +224,11 @@ const EditDoctorPage = () => {
   const handleDeleteEducation = async (id) => {
     setLoading(true);
     try {
-      await axios.delete(`/doctors/${id}/degrees`);
-      toast.success("Doctor Deleted Successfully");
+      const response = await axios.delete(`/doctors/${id}/degrees`);
+      toast.success(response?.data?.message);
       getDoctorEducation();
     } catch (error) {
-      console.log(error);
+      toast.error(error?.message);
     } finally {
       setLoading(false);
     }
@@ -245,12 +248,12 @@ const EditDoctorPage = () => {
       bankAccount: form.bankAccount.value,
       bkashAccount: form.bkashAccount.value,
       nagadAccount: form.nagadAccount.value,
-      districtId: Number(location.dispatchId) || doctor.districtId,
-      upazilaId: Number(location.upazilaId) || doctor.upazilaId,
-      specialityId: Number(form.speciality.value),
+      districtId: Number(location.dispatchId) || doctor.districtId?.id,
+      upazilaId: Number(location.upazilaId) || doctor.upazilaId?.id,
+      specialityId: Number(form.speciality.value) || null,
       rateOfVisit: Number(form.rateOfVisit.value),
-      initialBalance: Number(form.initialBalance.value),
-      bmdcNo: form.bmdcNo.value,
+      total_balance: Number(form.total_balance.value),
+      bmdcNumber: form.bmdcNumber.value,
       commissionPercentage: Number(form.commissionPercentage.value),
       assistantName: form.assistantName.value,
       assistantPhone: form.assistantPhone.value,
@@ -259,6 +262,7 @@ const EditDoctorPage = () => {
     try {
       await axios.put(`/doctors/${params.id}`, updatedFormData);
       toast.success("Doctor Updated Successfully");
+      navigate('/doctor/view-doctors')
     } catch (error) {
       toast.error(error.message || "something wrong");
       setLoading(false);
@@ -278,6 +282,7 @@ const EditDoctorPage = () => {
     setEducationForm({
       ...educationForm,
       degreeId: selectedOption?.value || null,
+      description: selectedOption?.nameEn,
     });
   };
   const handleSpecialityChange = (selectedOption) => {
@@ -466,7 +471,7 @@ const EditDoctorPage = () => {
             <div>
               <label className="form-label">District</label>
               <DistrictOptions
-                defaultValue={location?.districtId || doctor?.districtId}
+                defaultValue={location?.districtId || doctor?.districtId?.id}
                 onDistrictChange={handleDistrictChange}
               />
             </div>
@@ -475,8 +480,8 @@ const EditDoctorPage = () => {
             <div>
               <label className="form-label">Upazila</label>
               <UpazilaOptions
-                defaultValue={location?.upazilaId || doctor?.upazilaId}
-                districtId={doctor?.districtId}
+                defaultValue={location?.upazilaId || doctor?.upazilaId?.id}
+                districtId={location?.districtId || doctor?.districtId?.id}
                 onUpazilaChange={handleUpazilaChange}
               />
             </div>
@@ -485,12 +490,16 @@ const EditDoctorPage = () => {
             <div>
               <label className="form-label">Speciality</label>
               <select name="speciality" className="form-input form-select">
-                <option selected value={doctor?.speciality?.nameEn || ""}>
-                  {doctor?.speciality?.nameEn
-                    ? doctor?.speciality?.nameEn.charAt(0).toUpperCase() +
-                      doctor?.speciality?.nameEn.slice(1).toLowerCase()
-                    : "Choose"}
-                </option>
+                {doctor?.specialityId?.nameEn ? (
+                  <option value={doctor?.specialityId?.id} selected>
+                    {doctor?.specialityId?.nameEn?.charAt(0).toUpperCase() +
+                      doctor?.specialityId?.nameEn?.slice(1).toLowerCase()}
+                  </option>
+                ) : (
+                  <option value={""} disabled selected>
+                    Choose
+                  </option>
+                )}
                 <SpecialityOptions />
               </select>
             </div>
@@ -511,10 +520,10 @@ const EditDoctorPage = () => {
               <label className="form-label">Initial Balance</label>
               <input
                 type="number"
-                name="initialBalance"
+                name="total_balance"
                 placeholder="Enter Initial Balance"
                 className="form-input"
-                defaultValue={doctor?.initialBalance || ""}
+                defaultValue={doctor?.total_balance || ""}
               />
             </div>
 
@@ -523,7 +532,7 @@ const EditDoctorPage = () => {
               <label className="form-label">BMDC No</label>
               <input
                 type="text"
-                name="bmdcNo"
+                name="bmdcNumber"
                 placeholder="Enter BMDC No"
                 className="form-input"
                 defaultValue={doctor?.bmdcNumber || ""}
@@ -803,7 +812,7 @@ const EditDoctorPage = () => {
                                       }
                                       className="btn-primary"
                                     >
-                                      Add Education
+                                      Edit Education
                                     </button>
                                   </DialogFooter>
                                 </DialogContent>

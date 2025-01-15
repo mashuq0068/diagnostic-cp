@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "@/config/axiosConfig";
 import { CiEdit } from "react-icons/ci";
-import { DepartmentOptions } from "@/utility/SelectOptions";
+import { BloodGroupOptions, DepartmentOptions } from "@/utility/SelectOptions";
 import toast from "react-hot-toast";
 const EditEmployeePage = () => {
   const [designations, setDesignations] = useState([]);
@@ -16,7 +16,7 @@ const EditEmployeePage = () => {
     getSelectedEmployee();
     getAllDesignations();
   }, []);
-console.log(employee);
+  console.log(employee);
   //   handle get Selected employee
   const getSelectedEmployee = async () => {
     setLoading(true);
@@ -57,8 +57,8 @@ console.log(employee);
       nid: form.nid.value,
       phone: form.phone.value,
       email: form.email.value,
-      gender: form.gender.value,
-      bloodGroup: form.bloodGroup.value,
+      gender: form.gender.value || null,
+      bloodGroup: form.bloodGroup.value || null,
       address: form.address.value,
       joiningDate: form.joiningDate.value,
       salary: form.salary.value,
@@ -115,12 +115,16 @@ console.log(employee);
                 name="designation"
                 className="form-input"
               >
-                <option value={employee?.designation?.nameEn || ""}>
-                  {employee?.designation?.nameEn
-                    ? employee?.designation?.nameEn.charAt(0).toUpperCase() +
-                      employee?.designation?.nameEn.slice(1).toLowerCase()
-                    : "Choose"}
-                </option>
+                {employee?.designation?.nameBn ? (
+                  <option value={employee?.designation?.nameBn} selected>
+                    {employee?.designation?.nameBn?.charAt(0).toUpperCase() +
+                      employee?.designation?.nameBn?.slice(1).toLowerCase()}
+                  </option>
+                ) : (
+                  <option value={""} disabled selected>
+                    Choose
+                  </option>
+                )}
                 {designations.map((designation) => (
                   <option key={designation.id} value={designation.id}>
                     {designation.nameEn}
@@ -133,16 +137,20 @@ console.log(employee);
             <div>
               <label className="form-label">Department</label>
               <select
-                defaultValue={employee?.department?.nameEn}
+                defaultValue={employee?.department?.nameEn || ""}
                 name="department"
                 className="form-input"
               >
-                <option value={employee?.department?.id || ""}>
-                  {employee?.department?.nameEn
-                    ? employee?.department?.nameEn.charAt(0).toUpperCase() +
-                      employee?.department?.nameEn.slice(1).toLowerCase()
-                    : "Choose"}
-                </option>
+                {employee?.department?.nameEn ? (
+                  <option value={employee?.department?.nameEn} selected>
+                    {employee?.department?.nameEn?.charAt(0).toUpperCase() +
+                      employee?.department?.nameEn?.slice(1).toLowerCase()}
+                  </option>
+                ) : (
+                  <option value={""} disabled selected>
+                    Choose
+                  </option>
+                )}
                 <DepartmentOptions />
                 {/* Add more options as necessary */}
               </select>
@@ -201,12 +209,16 @@ console.log(employee);
                 name="gender"
                 className="form-input"
               >
-                <option value={employee?.gender || "Choose"}>
-                  {employee?.gender
-                    ? employee?.gender.charAt(0).toUpperCase() +
-                      employee?.gender.slice(1).toLowerCase()
-                    : "Choose"}
-                </option>
+                {employee?.gender ? (
+                  <option value={employee?.gender} selected>
+                    {employee?.gender?.charAt(0).toUpperCase() +
+                      employee?.gender?.slice(1).toLowerCase()}
+                  </option>
+                ) : (
+                  <option value={""} disabled selected>
+                    Choose
+                  </option>
+                )}
                 <option value="MALE">Male</option>
                 <option value="female">Female</option>
                 <option value="other">Other</option>
@@ -221,20 +233,17 @@ console.log(employee);
                 name="bloodGroup"
                 className="form-input"
               >
-                <option value={employee?.bloodGroup || "Choose"}>
-                  {employee?.bloodGroup
-                    ? employee?.bloodGroup.charAt(0).toUpperCase() +
-                      employee?.bloodGroup.slice(1).toLowerCase()
-                    : "Choose"}
-                </option>
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
+                {employee?.bloodGroup ? (
+                  <option value={employee?.bloodGroup} selected>
+                    {employee?.bloodGroup?.charAt(0).toUpperCase() +
+                      employee?.bloodGroup?.slice(1).toLowerCase()}
+                  </option>
+                ) : (
+                  <option value={""} disabled selected>
+                    Choose
+                  </option>
+                )}
+                <BloodGroupOptions />
               </select>
             </div>
 

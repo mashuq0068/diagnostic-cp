@@ -28,7 +28,7 @@ const initialState = {
 const CreatePatientPage = () => {
   const [formData, setFormData] = useState(initialState);
   const { setLoading } = useLoadingStore();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // create patient
   const handleSubmit = async (e) => {
@@ -38,10 +38,10 @@ const CreatePatientPage = () => {
       await axios.post("/patients", formData);
       toast.success("Patient Created Successfully");
       // clearing current data
-      
+
       setFormData({ ...initialState });
-      navigate('/patient/view-patients')
-      toast.success("patient created successfully")
+      navigate("/patient/view-patients");
+      toast.success("patient created successfully");
     } catch (error) {
       toast.error(error.message || "something wrong");
       setLoading(false);
@@ -62,6 +62,7 @@ const CreatePatientPage = () => {
             <div>
               <label className="form-label">Full Name</label>
               <input
+                required
                 onChange={(e) => {
                   setFormData({
                     ...formData,
@@ -85,6 +86,7 @@ const CreatePatientPage = () => {
                     fathersName: e.target.value,
                   });
                 }}
+                required
                 type="text"
                 name="father_name"
                 placeholder="Enter Father's Name"
@@ -137,7 +139,8 @@ const CreatePatientPage = () => {
                     phone: e.target.value,
                   });
                 }}
-                type="tel"
+                required
+                type="number"
                 name="phone"
                 placeholder="Enter Phone Number"
                 className="form-input"
@@ -154,6 +157,7 @@ const CreatePatientPage = () => {
                     email: e.target.value,
                   });
                 }}
+                required
                 type="email"
                 name="email"
                 placeholder="Enter Email"
@@ -171,6 +175,7 @@ const CreatePatientPage = () => {
                     gender: e.target.value,
                   });
                 }}
+                required
                 name="gender"
                 className="form-input"
               >
@@ -228,6 +233,7 @@ const CreatePatientPage = () => {
             <div>
               <label className="form-label">Emergency Contact</label>
               <input
+                required
                 onChange={(e) => {
                   setFormData({
                     ...formData,
@@ -245,6 +251,7 @@ const CreatePatientPage = () => {
             <div>
               <label className="form-label">Weight</label>
               <input
+                required
                 onChange={(e) => {
                   setFormData({
                     ...formData,
@@ -262,6 +269,7 @@ const CreatePatientPage = () => {
             <div>
               <label className="form-label">Height</label>
               <input
+                required
                 onChange={(e) => {
                   setFormData({
                     ...formData,
@@ -279,6 +287,7 @@ const CreatePatientPage = () => {
             <div>
               <label className="form-label">Blood Group</label>
               <select
+                required
                 onChange={(e) => {
                   setFormData({
                     ...formData,
@@ -291,7 +300,7 @@ const CreatePatientPage = () => {
                 <option value="" disabled selected>
                   Choose
                 </option>
-                <BloodGroupOptions/>
+                <BloodGroupOptions />
               </select>
             </div>
 

@@ -54,6 +54,7 @@ import EditLeave from "@/components/Hr/LeaveManagement/EditLeave";
 import { useEffect, useState } from "react";
 import useLoadingStore from "@/store/loadingStore";
 
+
 const Web = () => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const { setLoading } = useLoadingStore();
@@ -65,146 +66,145 @@ const Web = () => {
       setIsUserLoggedIn(true);
       setLoading(false);
     } else {
-      navigate("/");
+      navigate("/login");
       setIsUserLoggedIn(false);
       setLoading(false);
     }
   }, [isToken]);
   return (
-   
-      <Routes>
-       
-            <Route path="/create-user" element={<CreateUser />} />
-            <Route path="/login" element={<Login />} />
-    
-      
-            <Route path="/" element={<Dashboard />} />
-            {/* profile */}
-            <Route path="/view-profile" element={<ViewProfile />} />
-            <Route path="/edit-profile" element={<EditProfile />} />
-            {/* doctor */}
-            <Route path="/doctor/create-doctor" element={<CreateDoctor />} />
-            <Route path="/doctor/view-doctors" element={<ViewDoctors />} />
-            <Route
-              path="/doctor/doctor-transaction"
-              element={<DoctorTransaction />}
-            />
-            <Route path="/doctor/doctor-ledger" element={<DoctorLedger />} />
-            <Route
-              path="/doctor/commission-tracking"
-              element={<CommissionTracking />}
-            />
-            <Route path="/doctor/edit-doctor/:id" element={<EditDoctor />} />
+    <Routes>
+      {!isUserLoggedIn ? (
+        <>
+          <Route path="/create-user" element={<CreateUser />} />
+          <Route path="/login" element={<Login />} />
+        </>
+      ) : (
+        <>
+          <Route path="/create-user" element={<CreateUser />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Dashboard />} />
+          {/* profile */}
+          <Route path="/view-profile" element={<ViewProfile />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
+          {/* doctor */}
+          <Route path="/doctor/create-doctor" element={<CreateDoctor />} />
+          <Route path="/doctor/view-doctors" element={<ViewDoctors />} />
+          <Route
+            path="/doctor/doctor-transaction"
+            element={<DoctorTransaction />}
+          />
+          <Route path="/doctor/doctor-ledger" element={<DoctorLedger />} />
+          <Route
+            path="/doctor/commission-tracking"
+            element={<CommissionTracking />}
+          />
+          <Route path="/doctor/edit-doctor/:id" element={<EditDoctor />} />
 
-            {/* patient */}
-            <Route path="/patient/create-patient" element={<CreatePatient />} />
-            <Route path="/patient/view-patients" element={<ViewPatients />} />
-            <Route
-              path="/patient/patient-transaction"
-              element={<PatientTransaction />}
-            />
-            <Route path="/patient/patient-ledger" element={<PatientLedger />} />
-            <Route
-              path="/patient/appointment-scheduling"
-              element={<AppointmentScheduling />}
-            />
-            <Route
-              path="/patient/doctor-appointment"
-              element={<DoctorAppointment />}
-            />
-            <Route
-              path="/patient/book-appointment/:id"
-              element={<BookAppointment />}
-            />
-            <Route path="/patient/edit-patient/:id" element={<EditPatient />} />
+          {/* patient */}
+          <Route path="/patient/create-patient" element={<CreatePatient />} />
+          <Route path="/patient/view-patients" element={<ViewPatients />} />
+          <Route
+            path="/patient/patient-transaction"
+            element={<PatientTransaction />}
+          />
+          <Route path="/patient/patient-ledger" element={<PatientLedger />} />
+          <Route
+            path="/patient/appointment-scheduling"
+            element={<AppointmentScheduling />}
+          />
+          <Route
+            path="/patient/doctor-appointment"
+            element={<DoctorAppointment />}
+          />
+          <Route
+            path="/patient/book-appointment/:id"
+            element={<BookAppointment />}
+          />
+          <Route path="/patient/edit-patient/:id" element={<EditPatient />} />
 
-            {/* agent */}
-            <Route path="/agent/create-agent" element={<CreateAgent />} />
-            <Route path="/agent/view-agents" element={<ViewAgents />} />
-            <Route
-              path="/agent/agent-transaction"
-              element={<AgentTransaction />}
-            />
-            <Route path="/agent/agent-ledger" element={<AgentLedger />} />
-            <Route
-              path="/agent/commission-tracking"
-              element={<AgentCommissionTracking />}
-            />
-            <Route path="/agent/edit-agent/:id" element={<EditAgent />} />
+          {/* agent */}
+          <Route path="/agent/create-agent" element={<CreateAgent />} />
+          <Route path="/agent/view-agents" element={<ViewAgents />} />
+          <Route
+            path="/agent/agent-transaction"
+            element={<AgentTransaction />}
+          />
+          <Route path="/agent/agent-ledger" element={<AgentLedger />} />
+          <Route
+            path="/agent/commission-tracking"
+            element={<AgentCommissionTracking />}
+          />
+          <Route path="/agent/edit-agent/:id" element={<EditAgent />} />
 
-            {/* test */}
-            <Route path="/test/create-test" element={<CreateTest />} />
-            <Route path="/test/view-tests" element={<ViewTests />} />
-            <Route path="/test/invoice" element={<Invoice />} />
-            <Route
-              path="/test/test-result-input"
-              element={<TestResultInput />}
-            />
-            <Route
-              path="/test/test-report-generation"
-              element={<TestReportGeneration />}
-            />
-            <Route path="/test/edit-test/:id" element={<EditTest />} />
-            <Route path="/test/view-invoices" element={<ViewInvoices />} />
-            <Route path="/test/edit-invoice/:id" element={<EditInvoice />} />
+          {/* test */}
+          <Route path="/test/create-test" element={<CreateTest />} />
+          <Route path="/test/view-tests" element={<ViewTests />} />
+          <Route path="/test/invoice" element={<Invoice />} />
+          <Route path="/test/test-result-input" element={<TestResultInput />} />
+          <Route
+            path="/test/test-report-generation"
+            element={<TestReportGeneration />}
+          />
+          <Route path="/test/edit-test/:id" element={<EditTest />} />
+          <Route path="/test/view-invoices" element={<ViewInvoices />} />
+          <Route path="/test/edit-invoice/:id" element={<EditInvoice />} />
 
-            {/* accounts */}
-            <Route
-              path="/accounts/income-management"
-              element={<IncomeManagement />}
-            />
-            <Route path="/accounts/new-expense" element={<NewExpense />} />
-            <Route path="/accounts/field-expense" element={<FieldExpense />} />
-            <Route
-              path="/accounts/view-all-expenses"
-              element={<ViewAllExpenses />}
-            />
+          {/* accounts */}
+          <Route
+            path="/accounts/income-management"
+            element={<IncomeManagement />}
+          />
+          <Route path="/accounts/new-expense" element={<NewExpense />} />
+          <Route path="/accounts/field-expense" element={<FieldExpense />} />
+          <Route
+            path="/accounts/view-all-expenses"
+            element={<ViewAllExpenses />}
+          />
 
-            {/*reports */}
-            <Route
-              path="/reports/profit-loss-tracking"
-              element={<ProfileLossTracking />}
-            />
-            <Route path="/reports/expense-report" element={<ExpenseReport />} />
-            <Route path="/reports/sales-report" element={<SalesReport />} />
-            <Route
-              path="/reports/commission-tracking-report"
-              element={<CommissionTrackingReport />}
-            />
-            <Route path="/reports/income-report" element={<IncomeReport />} />
-            <Route
-              path="/reports/attendance-report"
-              element={<AttendanceReport />}
-            />
+          {/*reports */}
+          <Route
+            path="/reports/profit-loss-tracking"
+            element={<ProfileLossTracking />}
+          />
+          <Route path="/reports/expense-report" element={<ExpenseReport />} />
+          <Route path="/reports/sales-report" element={<SalesReport />} />
+          <Route
+            path="/reports/commission-tracking-report"
+            element={<CommissionTrackingReport />}
+          />
+          <Route path="/reports/income-report" element={<IncomeReport />} />
+          <Route
+            path="/reports/attendance-report"
+            element={<AttendanceReport />}
+          />
 
-            {/*hr */}
-            <Route
-              path="/hr/employee-management"
-              element={<EmployeeManagement />}
-            />
-            <Route path="/hr/leave-management" element={<LeaveManagement />} />
-            <Route
-              path="/hr/payroll-management"
-              element={<PayrollManagement />}
-            />
-            <Route
-              path="/hr/performance-tracking"
-              element={<PerformanceTracking />}
-            />
-            <Route
-              path="/hr/attendance-management"
-              element={<AttendanceManagement />}
-            />
-            <Route path="/hr/edit-employee/:id" element={<EditEmployee />} />
-            <Route path="/hr/edit-payroll/:id" element={<EditPayroll />} />
-            <Route path="/hr/edit-leave/:id" element={<EditLeave />} />
+          {/*hr */}
+          <Route
+            path="/hr/employee-management"
+            element={<EmployeeManagement />}
+          />
+          <Route path="/hr/leave-management" element={<LeaveManagement />} />
+          <Route
+            path="/hr/payroll-management"
+            element={<PayrollManagement />}
+          />
+          <Route
+            path="/hr/performance-tracking"
+            element={<PerformanceTracking />}
+          />
+          <Route
+            path="/hr/attendance-management"
+            element={<AttendanceManagement />}
+          />
+          <Route path="/hr/edit-employee/:id" element={<EditEmployee />} />
+          <Route path="/hr/edit-payroll/:id" element={<EditPayroll />} />
+          <Route path="/hr/edit-leave/:id" element={<EditLeave />} />
 
-            {/*user role */}
-            <Route path="/user-role" element={<UserRole />} />
-          
-    
-      </Routes>
-
+          {/*user role */}
+          <Route path="/user-role" element={<UserRole />} />
+        </>
+      )}
+    </Routes>
   );
 };
 

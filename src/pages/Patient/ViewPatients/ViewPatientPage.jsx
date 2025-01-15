@@ -29,7 +29,7 @@ import useLoadingStore from "@/store/loadingStore";
 import { buildQueryParams } from "@/utility/buildQueryParams";
 import { CiEdit } from "react-icons/ci";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { BiPlus } from "react-icons/bi";
 
@@ -41,7 +41,7 @@ const ViewPatientPage = () => {
   const [queryParams, setQueryParams] = useState({
     page: 0,
     size: 10,
-    fullName : ""
+    fullName: "",
   });
   useEffect(() => {
     getAllPatients();
@@ -74,26 +74,38 @@ const ViewPatientPage = () => {
     try {
       await axios.delete(`/patients?${id}`);
       toast.success("Patient Deleted Successfully");
-      getAllPatients()
+      getAllPatients();
     } catch (error) {
-      console.log(error);
+      toast.error("Delete is not permissible");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearchSubmit =(e) => {
-    e.preventDefault()
-    const searchTerm = e.target.search.value 
-    setQueryParams({...queryParams , fullName: searchTerm})
-  }
+  // from backend
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    // const searchTerm = e.target.search.value
+    // setQueryParams({...queryParams , fullName: searchTerm})
+  };
+  /// from frontend
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    if (!searchTerm) {
+      getAllPatients();
+    }
+    const filtered = patients.filter((patient) =>
+      patient.fullName.toLowerCase().includes(searchTerm)
+    );
+    setPatients(filtered);
+  };
   return (
     <div className="mb-8 ">
       <div>
         <SectionHeader title={"View patients"} />
       </div>
       <div className="wrapper">
-      <div className="w-full mb-6">
+        <div className="w-full mb-6">
           <div className="flex justify-between items-end gap-3 flex-wrap">
             <h2 className="text-base flex justify-between  flex-col font-medium mb-2">
               All Patients List
@@ -119,6 +131,7 @@ const ViewPatientPage = () => {
             <div className="flex py-2 items-center  space-x-2 bg-[#EBF5FF] px-4  rounded-full flex-shrink-0 w-full sm:w-auto mb-5 sm:mb-0">
               <FaSearch className="text-gray-500" />
               <input
+                onChange={handleSearchChange}
                 type="text"
                 name="search"
                 placeholder="Search"
@@ -224,24 +237,19 @@ const ViewPatientPage = () => {
                                       </span>
                                       {patient?.email || "----"}
                                     </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        District:
-                                      </span>
-                                      {patient?.districtId?.nameEn || "----"}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Upazila:
-                                      </span>
-                                      {patient?.upazilaId?.nameEn || "----"}
-                                    </p>
+                                    
 
                                     <p className="text-gray-600">
                                       <span className="font-medium mr-1">
                                         Emergency Contact:
                                       </span>
                                       {patient?.emergencyContact || "----"}
+                                    </p>
+                                    <p className="text-gray-600">
+                                      <span className="font-medium mr-1">
+                                        Balance:
+                                      </span>
+                                      {patient?.totalBalance || "----"}
                                     </p>
                                   </div>
                                 </div>
@@ -270,7 +278,7 @@ const ViewPatientPage = () => {
                                         Height:
                                       </span>
                                       {patient?.height
-                                        ? `${patient.height} cm`
+                                        ? `${patient.height} inch`
                                         : "----"}
                                     </p>
                                     <p className="text-gray-600">
@@ -305,7 +313,10 @@ const ViewPatientPage = () => {
                           </DialogContent>
                         </Dialog>
                         {/* Edit Button */}
-                        <Link to={`/patient/edit-patient/${patient?.id}`} className="btn-outline border border-green-500 rounded-lg text-black hover:text-white hover:bg-green-500 transition duration-300">
+                        <Link
+                          to={`/patient/edit-patient/${patient?.id}`}
+                          className="btn-outline border border-green-500 rounded-lg text-black hover:text-white hover:bg-green-500 transition duration-300"
+                        >
                           <CiEdit size={18} />
                         </Link>
 

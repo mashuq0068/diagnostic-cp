@@ -1,6 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
 import SectionHeader from "@/components/ui/section-header";
-import { DistrictOptions,  SpecialityOptions,  UpazilaOptions } from "@/utility/SelectOptions";
+import {
+  DistrictOptions,
+  SpecialityOptions,
+  UpazilaOptions,
+} from "@/utility/SelectOptions";
 import { useState } from "react";
 import { TbUserPlus } from "react-icons/tb";
 import axios from "@/config/axiosConfig";
@@ -23,11 +27,11 @@ const CreateDoctorPage = () => {
     bankAccount: null,
     bkashAccount: null,
     nagadAccount: null,
-    districtId:null,
-    upazilaId : null,
+    districtId: null,
+    upazilaId: null,
     specialityId: null,
     rateOfVisit: null,
-    initialBalance: null,
+    total_balance: null,
     bmdcNumber: null,
     commissionPercentage: null,
     assistantName: null,
@@ -35,7 +39,7 @@ const CreateDoctorPage = () => {
   };
   const [formData, setFormData] = useState(initialState);
 
-console.log(formData);
+  console.log(formData);
   const handleImageChange = (e) => {
     setSelectedImage(URL.createObjectURL(e.target.files[0]));
   };
@@ -143,6 +147,7 @@ console.log(formData);
             <div>
               <label className="form-label">Name (English)</label>
               <input
+                required
                 type="text"
                 name="name_en"
                 placeholder="Enter Name in English"
@@ -157,6 +162,7 @@ console.log(formData);
             <div>
               <label className="form-label">Name (Bangla)</label>
               <input
+                required
                 type="text"
                 name="name_bn"
                 placeholder="বাংলায় নাম লিখুন"
@@ -171,9 +177,9 @@ console.log(formData);
             <div>
               <label className="form-label">Years of Experience</label>
               <input
-                type="text"
-                name="years_of_experience"
                 required
+                type="number"
+                name="years_of_experience"
                 placeholder="Enter Years of Experience"
                 onChange={(e) => {
                   setFormData({
@@ -188,7 +194,8 @@ console.log(formData);
             <div>
               <label className="form-label">Phone</label>
               <input
-                type="tel"
+                required
+                type="number"
                 name="phone"
                 placeholder="Enter Phone Number"
                 onChange={(e) => {
@@ -201,6 +208,7 @@ console.log(formData);
             <div>
               <label className="form-label">Email</label>
               <input
+                required
                 type="email"
                 name="email"
                 placeholder="Enter Email"
@@ -215,7 +223,7 @@ console.log(formData);
             <div>
               <label className="form-label">Bank Account</label>
               <input
-                type="text"
+                type="number"
                 name="bank_account"
                 placeholder="Enter Bank Account"
                 onChange={(e) => {
@@ -229,7 +237,7 @@ console.log(formData);
             <div>
               <label className="form-label">BKash Account</label>
               <input
-                type="text"
+                type="number"
                 name="bkash_account"
                 placeholder="Enter BKash Account"
                 onChange={(e) => {
@@ -243,7 +251,7 @@ console.log(formData);
             <div>
               <label className="form-label">Nagad Account</label>
               <input
-                type="text"
+                type="number"
                 name="nagad_account"
                 placeholder="Enter Nagad Account"
                 onChange={(e) => {
@@ -256,13 +264,20 @@ console.log(formData);
             {/* District */}
             <div>
               <label className="form-label">District</label>
-              <DistrictOptions defaultValue={formData?.districtId} onDistrictChange={handleDistrictChange} />
+              <DistrictOptions
+                defaultValue={formData?.districtId}
+                onDistrictChange={handleDistrictChange}
+              />
             </div>
 
             {/* Upazila */}
             <div>
               <label className="form-label">Upazila</label>
-              <UpazilaOptions defaultValue={formData?.upazilaId} districtId={formData?.districtId} onUpazilaChange={handleUpazilaChange} />
+              <UpazilaOptions
+                defaultValue={formData?.upazilaId}
+                districtId={formData?.districtId}
+                onUpazilaChange={handleUpazilaChange}
+              />
             </div>
 
             {/* speciality */}
@@ -295,7 +310,7 @@ console.log(formData);
                     rateOfVisit: Number(e.target.value),
                   });
                 }}
-                type="text"
+                type="number"
                 name="rate_of_visit"
                 placeholder="Enter Rate of Visit"
                 className="form-input"
@@ -309,10 +324,10 @@ console.log(formData);
                 onChange={(e) => {
                   setFormData({
                     ...formData,
-                    initialBalance: Number(e.target.value),
+                    total_balance: Number(e.target.value),
                   });
                 }}
-                type="text"
+                type="number"
                 name="initial_balance"
                 placeholder="Enter Initial Balance"
                 className="form-input"
@@ -331,7 +346,6 @@ console.log(formData);
                   });
                 }}
                 name="bmdc_text"
-                required
                 placeholder="Enter BMDC No"
                 className="form-input"
               />
@@ -347,7 +361,7 @@ console.log(formData);
                     commissionPercentage: Number(e.target.value),
                   });
                 }}
-                type="text"
+                type="number"
                 name="commission_percentage"
                 placeholder="Enter Commission Percentage"
                 className="form-input"
@@ -381,7 +395,7 @@ console.log(formData);
                     assistantPhone: e.target.value,
                   });
                 }}
-                type="tel"
+                type="number"
                 name="assistant_phone"
                 placeholder="Enter Assistant Phone"
                 className="form-input"

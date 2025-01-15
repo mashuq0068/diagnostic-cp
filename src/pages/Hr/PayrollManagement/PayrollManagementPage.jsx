@@ -34,6 +34,7 @@ import Select from "react-select";
 import customStyles from "@/utility/react-select-styles";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import PlaceHolder from "@/utility/PlaceHolder";
 
 const initialPayrollState = {
   employeeId: null,
@@ -110,12 +111,23 @@ const PayrollManagementPage = () => {
       toast.success("Payroll Deleted Successfully");
       getAllPayrolls();
     } catch (error) {
-      console.log(error);
+      toast.error("Delete is not permissible");
     } finally {
       setLoading(false);
     }
   };
 
+  /// from frontend
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    if (!searchTerm) {
+      getAllPayrolls();
+    }
+    const filtered = payrollList.filter((payroll) =>
+      payroll?.employee?.nameEn.toLowerCase().includes(searchTerm)
+    );
+    setPayrollList(filtered);
+  };
   return (
     <div className="mb-8 ">
       <div>
@@ -262,6 +274,7 @@ const PayrollManagementPage = () => {
               <div className="flex py-2 items-center  space-x-2 bg-[#EBF5FF] px-4  rounded-full flex-shrink-0 w-full sm:w-auto mb-5 sm:mb-0">
                 <FaSearch className="text-gray-500" />
                 <input
+                  onChange={handleSearchChange}
                   type="text"
                   placeholder="Search"
                   className="bg-transparent outline-none text-gray-600 w-full"
@@ -282,130 +295,138 @@ const PayrollManagementPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {payrollList?.map((payroll, index) => (
-                    <tr key={index} className="border-b hover:bg-gray-100">
-                      <td className="py-4 flex items-center">
-                        <span>{payroll?.employee?.nameEn}</span>
-                      </td>
-                      <td>{payroll?.salary}</td>
-                      <td>{payroll?.basicSalary || 0}</td>
-                      <td>{payroll?.deductions || 0}</td>
+                  {payrollList?.length > 0 ? (
+                    payrollList?.map((payroll, index) => (
+                      <tr key={index} className="border-b hover:bg-gray-100">
+                        <td className="py-4 flex items-center">
+                          <span>{payroll?.employee?.nameEn}</span>
+                        </td>
+                        <td>{payroll?.salary}</td>
+                        <td>{payroll?.basicSalary || 0}</td>
+                        <td>{payroll?.deductions || 0}</td>
 
-                      <td>{payrollList?.paymentDate || "----"}</td>
-                      <td className="flex space-x-2">
-                        {/* View Details Button */}
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <button className="btn-outline">
-                              <IoInformation size={18} />
-                            </button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-[500px] bg-white rounded-lg shadow-lg p-6">
-                            <DialogHeader>
-                              <DialogTitle className="text-xl font-semibold text-gray-800">
-                                Payroll Details
-                              </DialogTitle>
-                              <DialogDescription className="text-gray-500 text-sm">
-                                Information for Payroll.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogDescription>
-                              <div className="grid grid-cols-1 gap-6">
-                                {/* Transaction Information Section */}
-                                <div className="p-4">
-                                  <div className="w-full mb-6">
-                                    <h2 className="text-base text-black font-medium mb-2">
-                                      Payroll Information
-                                    </h2>
-                                    <div className="h-[2px] bg-gray-200">
-                                      <div className="h-[2px] bg-primary w-[210px]"></div>
+                        <td>{payrollList?.paymentDate || "----"}</td>
+                        <td className="flex space-x-2">
+                          {/* View Details Button */}
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <button className="btn-outline">
+                                <IoInformation size={18} />
+                              </button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[500px] bg-white rounded-lg shadow-lg p-6">
+                              <DialogHeader>
+                                <DialogTitle className="text-xl font-semibold text-gray-800">
+                                  Payroll Details
+                                </DialogTitle>
+                                <DialogDescription className="text-gray-500 text-sm">
+                                  Information for Payroll.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <DialogDescription>
+                                <div className="grid grid-cols-1 gap-6">
+                                  {/* Transaction Information Section */}
+                                  <div className="p-4">
+                                    <div className="w-full mb-6">
+                                      <h2 className="text-base text-black font-medium mb-2">
+                                        Payroll Information
+                                      </h2>
+                                      <div className="h-[2px] bg-gray-200">
+                                        <div className="h-[2px] bg-primary w-[210px]"></div>
+                                      </div>
+                                    </div>
+                                    <div className="space-y-4">
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Employee Name:
+                                        </span>
+                                        {payroll?.employee?.nameEn}
+                                      </p>
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Salary:
+                                        </span>
+                                        {payroll?.salary || 0}
+                                      </p>
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Basic Salary:
+                                        </span>
+                                        {payroll?.basicSalary || 0}
+                                      </p>
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Deductions:
+                                        </span>
+                                        {payroll?.deductions || 0}
+                                      </p>
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          paymentDate:
+                                        </span>
+                                        {payroll?.paymentDate || "---"}
+                                      </p>
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Remarks:
+                                        </span>
+                                        {payroll?.remarks || "---"}
+                                      </p>
                                     </div>
                                   </div>
-                                  <div className="space-y-4">
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Employee Name:
-                                      </span>
-                                      {payroll?.employee?.nameEn}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Salary:
-                                      </span>
-                                      {payroll?.salary || 0}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Basic Salary:
-                                      </span>
-                                      {payroll?.basicSalary || 0}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Deductions:
-                                      </span>
-                                      {payroll?.deductions || 0}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        paymentDate:
-                                      </span>
-                                      {payroll?.paymentDate || "---"}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Remarks:
-                                      </span>
-                                      {payroll?.remarks || "---"}
-                                    </p>
-                                  </div>
                                 </div>
-                              </div>
-                            </DialogDescription>
-                          </DialogContent>
-                        </Dialog>
-                        {/* Edit Button */}
+                              </DialogDescription>
+                            </DialogContent>
+                          </Dialog>
+                          {/* Edit Button */}
 
-                        <Link
-                          to={`/hr/edit-payroll/${payroll?.id}`}
-                          className="btn-outline border border-green-500 rounded-lg text-black hover:text-white hover:bg-green-500 transition duration-300"
-                        >
-                          <CiEdit size={18} />
-                        </Link>
-                        {/* Delete Button */}
+                          <Link
+                            to={`/hr/edit-payroll/${payroll?.id}`}
+                            className="btn-outline border border-green-500 rounded-lg text-black hover:text-white hover:bg-green-500 transition duration-300"
+                          >
+                            <CiEdit size={18} />
+                          </Link>
+                          {/* Delete Button */}
 
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <button className="btn-outline border border-red-400 rounded-lg text-red-400 hover:text-white hover:bg-red-400 transition duration-300">
-                              <RiDeleteBinLine size={18} />
-                            </button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Are you absolutely sure?
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone.Because, This will
-                                permanently delete your data.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel className="btn-primary bg-gray-200 text-black hover:text-black hover:bg-gray-300">
-                                Cancel
-                              </AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDelete(payroll?.id)}
-                                className="btn-primary bg-red-500 hover:bg-red-600"
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button className="btn-outline border border-red-400 rounded-lg text-red-400 hover:text-white hover:bg-red-400 transition duration-300">
+                                <RiDeleteBinLine size={18} />
+                              </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone.Because, This
+                                  will permanently delete your data.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel className="btn-primary bg-gray-200 text-black hover:text-black hover:bg-gray-300">
+                                  Cancel
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(payroll?.id)}
+                                  className="btn-primary bg-red-500 hover:bg-red-600"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="12" className="py-8 text-center">
+                        <PlaceHolder />
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

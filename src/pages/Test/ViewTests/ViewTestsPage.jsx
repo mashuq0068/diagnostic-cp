@@ -79,7 +79,7 @@ const initialDepartmentState = {
   phone: null,
   location: null,
   code: null,
-  parentId:null,
+  parentId: null,
   createdBy: "system",
   updatedBy: "system",
 };
@@ -168,6 +168,9 @@ const ViewTestsPage = () => {
       await axios.post("/tests", testFormData);
       toast.success("Test Created Successfully");
       // clearing current data
+      getAllTests()
+      setShowCreateDepartment(false)
+      setShowCreateTest(false)
       setTestFormData({ ...testFormData });
     } catch (error) {
       toast.error(error.message || "something wrong");
@@ -184,6 +187,9 @@ const ViewTestsPage = () => {
     try {
       await axios.post("/departments", departmentFormData);
       toast.success("Department Created Successfully");
+      getDepartments()
+      setShowCreateDepartment(false)
+      setShowCreateTest(false)
       // clearing current data
       setTestFormData({ ...departmentFormData });
     } catch (error) {
@@ -201,7 +207,7 @@ const ViewTestsPage = () => {
       toast.success("Test Deleted Successfully");
       getAllTests();
     } catch (error) {
-      console.log(error);
+      toast.error("Delete is not permissible");
     } finally {
       setLoading(false);
     }
@@ -209,8 +215,19 @@ const ViewTestsPage = () => {
   // search
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    const searchTerm = e.target.search.value;
-    setQueryParams({ ...queryParams, nameEn: searchTerm });
+    // const searchTerm = e.target.search.value;
+    // setQueryParams({ ...queryParams, nameEn: searchTerm });
+  };
+  /// from frontend
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    if (!searchTerm) {
+      getAllTests();
+    }
+    const filtered = tests.filter((test) =>
+      test.nameEn.toLowerCase().includes(searchTerm)
+    );
+    setTests(filtered);
   };
   return (
     <div className="mb-8 ">
@@ -274,21 +291,22 @@ const ViewTestsPage = () => {
         </div>
         {!showCreateDepartment && !showCreateTest && (
           <div>
-            <div className="xl:flex gap-5 mb-6">
+            <div className="xl:flex flex-wrap gap-5 mb-6">
               {/* Search Input */}
               <form onSubmit={handleSearchSubmit}>
-                <div className="flex py-2 items-center  space-x-2 bg-[#EBF5FF] px-4  rounded-full flex-shrink-0 w-full sm:w-auto mb-5 sm:mb-0">
+                <div className="flex py-2 items-center  max-w-[300px]  space-x-2 bg-[#EBF5FF] px-4  rounded-full flex-shrink-0 w-full sm:w-auto mb-5 sm:mb-0">
                   <FaSearch className="text-gray-500" />
                   <input
+                    onChange={handleSearchChange}
                     type="text"
                     name="search"
                     placeholder="Search"
-                    className="bg-transparent outline-none text-gray-600 w-full"
+                    className="bg-transparent max-w-[350px] w-full outline-none text-gray-600 "
                   />
                 </div>
               </form>
 
-              <div className="flex md:flex-row flex-col gap-6 flex-wrap">
+              <div className="flex md:flex-row xl:mt-0 mt-8 flex-col gap-6 flex-wrap">
                 {/* Filter by Department */}
                 <Menubar>
                   <MenubarMenu>
@@ -403,60 +421,60 @@ const ViewTestsPage = () => {
                                   <DialogTitle>Test Details</DialogTitle>
                                 </DialogHeader>
                                 <DialogDescription>
-                                <div className="p-4">
-                                <div className="w-full mb-6">
-                                    <h2 className="text-base text-black font-medium mb-2">
-                                      Test Information
-                                    </h2>
-                                    <div className="h-[2px] bg-gray-200">
-                                      <div className="h-[2px] bg-primary w-[210px]"></div>
+                                  <div className="p-4">
+                                    <div className="w-full mb-6">
+                                      <h2 className="text-base text-black font-medium mb-2">
+                                        Test Information
+                                      </h2>
+                                      <div className="h-[2px] bg-gray-200">
+                                        <div className="h-[2px] bg-primary w-[210px]"></div>
+                                      </div>
+                                    </div>
+                                    <div className="space-y-4">
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Name:
+                                        </span>
+                                        {test?.nameEn || "----"}
+                                      </p>
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Description:
+                                        </span>
+                                        {test?.descriptionEn || "----"}
+                                      </p>
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Sample Type:
+                                        </span>
+                                        {test?.sampleType || "----"}
+                                      </p>
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Price:
+                                        </span>
+                                        {test?.price || "----"}
+                                      </p>
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Department:
+                                        </span>
+                                        {test?.department?.nameEn || "----"}
+                                      </p>
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Associated Equipment:
+                                        </span>
+                                        {test?.associatedEquipment || "----"}
+                                      </p>
+                                      <p className="text-gray-600">
+                                        <span className="font-medium mr-1">
+                                          Is Active:
+                                        </span>
+                                        {test?.isActive ? "Yes" : "No"}
+                                      </p>
                                     </div>
                                   </div>
-                                  <div className="space-y-4">
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Name:
-                                      </span>
-                                      {test?.nameEn || "----"}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Description:
-                                      </span>
-                                      {test?.descriptionEn || "----"}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Sample Type:
-                                      </span>
-                                      {test?.sampleType || "----"}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Price:
-                                      </span>
-                                      {test?.price || "----"}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Department:
-                                      </span>
-                                      {test?.department?.nameEn || "----"}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Associated Equipment:
-                                      </span>
-                                      {test?.associatedEquipment || "----"}
-                                    </p>
-                                    <p className="text-gray-600">
-                                      <span className="font-medium mr-1">
-                                        Is Active:
-                                      </span>
-                                      {test?.isActive ? "Yes" : "No"}
-                                    </p>
-                                  </div>
-                                </div>
                                 </DialogDescription>
                               </DialogContent>
                             </Dialog>
@@ -562,7 +580,7 @@ const ViewTestsPage = () => {
                       price: e.target.value,
                     }));
                   }}
-                  type="text"
+                  type="number"
                   name="price"
                   placeholder="Enter Price"
                   className="form-input"
@@ -722,7 +740,7 @@ const ViewTestsPage = () => {
                 <div>
                   <label className="form-label">Phone</label>
                   <input
-                    type="tel"
+                    type="number"
                     placeholder="Enter phone number"
                     className="form-input"
                     onChange={(e) =>

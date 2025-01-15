@@ -16,7 +16,7 @@ const generateMockDoctors = (page, size) => {
       bankAccount: `AC-${10000 + i}`,
       bkashAccount: `+8801${i}BKASH`,
       nagadAccount: `+8801${i}NAGAD`,
-      initialBalance: `${Math.random() * 1000}`,
+      total_balance: `${Math.random() * 1000}`,
       commissionPercentage: `${Math.random() * 10}%`,
     }));
   

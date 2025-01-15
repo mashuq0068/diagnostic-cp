@@ -17,7 +17,7 @@ const initialState = {
   nagadAccount: null,
   districtId: null,
   upazilaId: null,
-  initialBalance: null,
+  total_balance: null,
   commissionPercentage: null,
 };
 
@@ -140,6 +140,7 @@ const CreateAgentPage = () => {
                     nameEn: e.target.value,
                   });
                 }}
+                required
                 type="text"
                 name="name_en"
                 placeholder="Enter Name in English"
@@ -157,6 +158,7 @@ const CreateAgentPage = () => {
                     nameBn: e.target.value,
                   });
                 }}
+                required
                 type="text"
                 name="name_bn"
                 placeholder="বাংলায় নাম লিখুন"
@@ -174,7 +176,8 @@ const CreateAgentPage = () => {
                     phone: e.target.value,
                   });
                 }}
-                type="tel"
+                required
+                type="number"
                 name="phone"
                 placeholder="Enter Phone Number"
                 className="form-input"
@@ -190,6 +193,7 @@ const CreateAgentPage = () => {
                     email: e.target.value,
                   });
                 }}
+                required
                 type="email"
                 name="email"
                 placeholder="Enter Phone Number"
@@ -207,7 +211,8 @@ const CreateAgentPage = () => {
                     bankAccount: e.target.value,
                   });
                 }}
-                type="text"
+              
+                type="number"
                 name="bank_account"
                 placeholder="Enter Bank Account"
                 className="form-input"
@@ -224,7 +229,8 @@ const CreateAgentPage = () => {
                     bkashAccount: e.target.value,
                   });
                 }}
-                type="text"
+               
+                type="number"
                 name="bkash_account"
                 placeholder="Enter BKash Account"
                 className="form-input"
@@ -241,7 +247,8 @@ const CreateAgentPage = () => {
                     nagadAccount: e.target.value,
                   });
                 }}
-                type="text"
+             
+                type="number"
                 name="nagad_account"
                 placeholder="Enter Nagad Account"
                 className="form-input"
@@ -252,6 +259,7 @@ const CreateAgentPage = () => {
             <div>
               <label className="form-label">District</label>
               <DistrictOptions
+              
                 defaultValue={formData.districtId}
                 onDistrictChange={handleDistrictChange}
               />
@@ -274,10 +282,10 @@ const CreateAgentPage = () => {
                 onChange={(e) => {
                   setFormData({
                     ...formData,
-                    initialBalance: Number(e.target.value),
+                    total_balance: Number(e.target.value),
                   });
                 }}
-                type="text"
+                type="number"
                 name="initial_balance"
                 placeholder="Enter Initial Balance"
                 className="form-input"
@@ -294,7 +302,7 @@ const CreateAgentPage = () => {
                     commissionPercentage: Number(e.target.value),
                   });
                 }}
-                type="text"
+                type="number"
                 name="commission_percentage"
                 placeholder="Enter Commission Percentage"
                 className="form-input"

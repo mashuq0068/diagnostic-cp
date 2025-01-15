@@ -39,6 +39,7 @@ import axios from "@/config/axiosConfig";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { capitalizeWords } from "@/utility/capitalizeWords";
+import PlaceHolder from "@/utility/PlaceHolder";
 
 const LeaveManagementPage = () => {
   const [showForm, setShowForm] = useState(false);
@@ -76,15 +77,14 @@ const LeaveManagementPage = () => {
         status: "",
         remarks: "",
       });
-      setShowForm(false)
-      getAllLeaves()
+      setShowForm(false);
+      getAllLeaves();
     } catch (error) {
       toast.error(error.message || "Error creating leave. Please try again.");
     } finally {
       setLoading(false);
     }
   };
- 
 
   // Get all leaves
   const getAllLeaves = async () => {
@@ -99,19 +99,30 @@ const LeaveManagementPage = () => {
       setLoading(false);
     }
   };
-    // handleDelete
-    const handleDelete = async (id) => {
-      setLoading(true);
-      try {
-        await axios.delete(`/leaves/${id}`);
-        toast.success("Leave Deleted Successfully");
-        getAllLeaves();
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // handleDelete
+  const handleDelete = async (id) => {
+    setLoading(true);
+    try {
+      await axios.delete(`/leaves/${id}`);
+      toast.success("Leave Deleted Successfully");
+      getAllLeaves();
+    } catch (error) {
+      toast.error("Delete is not permissible");
+    } finally {
+      setLoading(false);
+    }
+  };
+  /// from frontend
+  const handleSearchChange = (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    if (!searchTerm) {
+      getAllLeaves();
+    }
+    const filtered = leavesList.filter((payroll) =>
+      payroll?.employee?.nameEn.toLowerCase().includes(searchTerm)
+    );
+    setLeavesList(filtered);
+  };
   return (
     <div className="mb-8 ">
       <div>
@@ -271,6 +282,8 @@ const LeaveManagementPage = () => {
               <div className="flex py-2 items-center  space-x-2 bg-[#EBF5FF] px-4  rounded-full flex-shrink-0 w-full sm:w-auto mb-5 sm:mb-0">
                 <FaSearch className="text-gray-500" />
                 <input
+
+                  onChange={handleSearchChange}
                   type="text"
                   placeholder="Search"
                   className="bg-transparent outline-none text-gray-700 w-full"
@@ -291,135 +304,146 @@ const LeaveManagementPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {leavesList?.map((leave) => (
-                    <tr key={leave?.id} className="border-b hover:bg-gray-100">
-                      <td className="py-4 ">{leave?.employee?.nameEn}</td>
-                      <td>{leave?.fromDate}</td>
-                      <td>{leave?.toDate}</td>
-                      <td>{leave?.reason}</td>
-                      <td>{capitalizeWords(leave?.status) || "----"}</td>
-                      <td>{capitalizeWords(leave?.leaveType) || "----"}</td>
-                      <td className="flex space-x-2">
-                        {/* View Details Button */}
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <button className="btn-outline">
-                              <IoInformation size={18} />
-                            </button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                              <DialogTitle>Leave Details</DialogTitle>
-                              <DialogDescription className="text-gray-500 text-sm">
-                                Information for Leave.
-                              </DialogDescription>
-                              <DialogDescription>
-                                <div className="grid grid-cols-1 gap-6">
-                                  {/* Leave Information Section */}
-                                  <div className="p-4">
-                                    <div className="w-full mb-6">
-                                      <h2 className="text-base text-black font-medium mb-2">
-                                        Leave Information
-                                      </h2>
-                                      <div className="h-[2px] bg-gray-200">
-                                        <div className="h-[2px] bg-primary w-[210px]"></div>
+                  {leavesList?.length > 0 ? (
+                    leavesList?.map((leave) => (
+                      <tr
+                        key={leave?.id}
+                        className="border-b hover:bg-gray-100"
+                      >
+                        <td className="py-4 ">{leave?.employee?.nameEn}</td>
+                        <td>{leave?.fromDate}</td>
+                        <td>{leave?.toDate}</td>
+                        <td>{leave?.reason}</td>
+                        <td>{capitalizeWords(leave?.status) || "----"}</td>
+                        <td>{capitalizeWords(leave?.leaveType) || "----"}</td>
+                        <td className="flex space-x-2">
+                          {/* View Details Button */}
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <button className="btn-outline">
+                                <IoInformation size={18} />
+                              </button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                                <DialogTitle>Leave Details</DialogTitle>
+                                <DialogDescription className="text-gray-500 text-sm">
+                                  Information for Leave.
+                                </DialogDescription>
+                                <DialogDescription>
+                                  <div className="grid grid-cols-1 gap-6">
+                                    {/* Leave Information Section */}
+                                    <div className="p-4">
+                                      <div className="w-full mb-6">
+                                        <h2 className="text-base text-black font-medium mb-2">
+                                          Leave Information
+                                        </h2>
+                                        <div className="h-[2px] bg-gray-200">
+                                          <div className="h-[2px] bg-primary w-[210px]"></div>
+                                        </div>
+                                      </div>
+                                      <div className="space-y-4">
+                                        <p className="text-gray-700">
+                                          <span className="font-medium mr-1">
+                                            Employee Name:
+                                          </span>
+                                          {leave?.employee?.nameEn}
+                                        </p>
+                                        <p className="text-gray-700">
+                                          <span className="font-medium mr-1">
+                                            From Date:
+                                          </span>
+                                          {leave?.fromDate}
+                                        </p>
+                                        <p className="text-gray-700">
+                                          <span className="font-medium mr-1">
+                                            To Date:
+                                          </span>
+                                          {leave?.toDate}
+                                        </p>
+                                        <p className="text-gray-700">
+                                          <span className="font-medium mr-1">
+                                            Reason:
+                                          </span>
+                                          {leave?.reason}
+                                        </p>
+                                        <p className="text-gray-700">
+                                          <span className="font-medium mr-1">
+                                            Status:
+                                          </span>
+                                          {capitalizeWords(leave?.status) ||
+                                            "----"}
+                                        </p>
+                                        <p className="text-gray-700">
+                                          <span className="font-medium mr-1">
+                                            Leave Type:
+                                          </span>
+                                          {capitalizeWords(leave?.leaveType) ||
+                                            "----"}
+                                        </p>
+                                        <p className="text-gray-700">
+                                          <span className="font-medium mr-1">
+                                            Remarks:
+                                          </span>
+                                          {leave?.remarks || "----"}
+                                        </p>
                                       </div>
                                     </div>
-                                    <div className="space-y-4">
-                                      <p className="text-gray-700">
-                                        <span className="font-medium mr-1">
-                                          Employee Name:
-                                        </span>
-                                        {leave?.employee?.nameEn}
-                                      </p>
-                                      <p className="text-gray-700">
-                                        <span className="font-medium mr-1">
-                                          From Date:
-                                        </span>
-                                        {leave?.fromDate}
-                                      </p>
-                                      <p className="text-gray-700">
-                                        <span className="font-medium mr-1">
-                                          To Date:
-                                        </span>
-                                        {leave?.toDate}
-                                      </p>
-                                      <p className="text-gray-700">
-                                        <span className="font-medium mr-1">
-                                          Reason:
-                                        </span>
-                                        {leave?.reason}
-                                      </p>
-                                      <p className="text-gray-700">
-                                        <span className="font-medium mr-1">
-                                          Status:
-                                        </span>
-                                        {capitalizeWords(leave?.status) ||
-                                          "----"}
-                                      </p>
-                                      <p className="text-gray-700">
-                                        <span className="font-medium mr-1">
-                                          Leave Type:
-                                        </span>
-                                        {capitalizeWords(leave?.leaveType) ||
-                                          "----"}
-                                      </p>
-                                      <p className="text-gray-700">
-                                        <span className="font-medium mr-1">
-                                          Remarks:
-                                        </span>
-                                        {leave?.remarks || "----"}
-                                      </p>
-                                    </div>
                                   </div>
-                                </div>
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4"></div>
-                            <DialogFooter></DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                        {/* Edit Button */}
-                        <Link
-                          to={`/hr/edit-leave/${leave?.id}`}
-                          className="btn-outline border border-green-500 rounded-lg text-black hover:text-white hover:bg-green-500 transition duration-300"
-                        >
-                          <CiEdit size={18} />
-                        </Link>
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4"></div>
+                              <DialogFooter></DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                          {/* Edit Button */}
+                          <Link
+                            to={`/hr/edit-leave/${leave?.id}`}
+                            className="btn-outline border border-green-500 rounded-lg text-black hover:text-white hover:bg-green-500 transition duration-300"
+                          >
+                            <CiEdit size={18} />
+                          </Link>
 
-                        {/* Delete Button */}
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <button className="btn-outline border border-red-400 rounded-lg text-red-400 hover:text-white hover:bg-red-400 transition duration-300">
-                              <RiDeleteBinLine size={18} />
-                            </button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Are you absolutely sure?
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone.Because, This will
-                                permanently delete your data.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel className="btn-primary bg-gray-200 text-black hover:text-black hover:bg-gray-300">
-                                Cancel
-                              </AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDelete(leave?.id)}
-                                className="btn-primary bg-red-500 hover:bg-red-600"
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                          {/* Delete Button */}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button className="btn-outline border border-red-400 rounded-lg text-red-400 hover:text-white hover:bg-red-400 transition duration-300">
+                                <RiDeleteBinLine size={18} />
+                              </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone.Because, This
+                                  will permanently delete your data.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel className="btn-primary bg-gray-200 text-black hover:text-black hover:bg-gray-300">
+                                  Cancel
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(leave?.id)}
+                                  className="btn-primary bg-red-500 hover:bg-red-600"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="12" className="py-8 text-center">
+                        <PlaceHolder />
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>

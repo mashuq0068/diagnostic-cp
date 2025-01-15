@@ -1,13 +1,14 @@
 // axiosConfig.js
 import axios  from 'axios';
 
-axios.defaults.baseURL = 'http://167.99.64.12:6600/api'; 
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL; 
 // http://192.168.10.185:6600/
 
 axios.interceptors.request.use(
   (config) => {
     // Get the token from localStorage or any other storage mechanism
     const token = localStorage.getItem('token'); 
+
     
     if (token) {
       // Add the token to the Authorization header

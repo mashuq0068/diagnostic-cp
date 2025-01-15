@@ -138,7 +138,7 @@ const SidebarItems = {
           url: "/test/view-invoices",
         },
         {
-          title: "Invoice/Bill",
+          title: "Invoice Generation",
           url: "/test/invoice",
         },
         {

@@ -55,12 +55,11 @@ const EditAgentPage = () => {
       bankAccount: form.bankAccount.value,
       bkashAccount: form.bkashAccount.value,
       nagadAccount: form.nagadAccount.value,
-      districtId: Number(location.districtId) || agent.districtId,
-      upazilaId: Number(location.upazilaId) || agent.upazilaId,
-      initialBalance: Number(form.initialBalance.value),
+      districtId: Number(location.districtId) || agent.districtId?.id,
+      upazilaId: Number(location.upazilaId) || agent.upazilaId?.id,
+      total_balance: Number(form.total_balance.value),
       commissionPercentage: Number(form.commissionPercentage.value),
     };
-    console.log(updatedAgent);
 
     try {
       // setLoading(true);
@@ -188,7 +187,7 @@ const EditAgentPage = () => {
                 name="phone"
                 placeholder="Enter Phone Number"
                 className="form-input"
-                defaultValue={agent?.user?.phone || ""}
+                defaultValue={agent?.phone || ""}
               />
             </div>
 
@@ -200,7 +199,7 @@ const EditAgentPage = () => {
                 name="email"
                 placeholder="Enter Email"
                 className="form-input"
-                defaultValue={agent?.user?.email || ""}
+                defaultValue={agent?.email || ""}
               />
             </div>
 
@@ -244,7 +243,7 @@ const EditAgentPage = () => {
             <div>
               <label className="form-label">District</label>
               <DistrictOptions
-                defaultValue={location.districtId || agent?.districtId}
+                defaultValue={location.districtId || agent?.districtId?.id}
                 onDistrictChange={handleDistrictChange}
               />
             </div>
@@ -253,8 +252,8 @@ const EditAgentPage = () => {
             <div>
               <label className="form-label">Upazila</label>
               <UpazilaOptions
-                defaultValue={location.upazilaId || agent?.upazilaId}
-                districtId={agent?.districtId}
+                defaultValue={location.upazilaId || agent?.upazilaId?.id}
+                districtId={ location.districtId || agent?.districtId?.id}
                 onUpazilaChange={handleUpazilaChange}
               />
             </div>
@@ -264,10 +263,10 @@ const EditAgentPage = () => {
               <label className="form-label">Initial Balance</label>
               <input
                 type="text"
-                name="initialBalance"
+                name="total_balance"
                 placeholder="Enter Initial Balance"
                 className="form-input"
-                defaultValue={agent?.initialBalance || ""}
+                defaultValue={agent?.total_balance || ""}
               />
             </div>
 
